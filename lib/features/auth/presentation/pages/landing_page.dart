@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({super.key});
@@ -9,7 +9,6 @@ class LandingPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Image (Replace with your actual image path)
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -33,11 +32,7 @@ class LandingPage extends StatelessWidget {
                       SizedBox(width: 8),
                       Text(
                         'Community Touring Rwanda',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: AppTextStyles.landingHeader,
                       ),
                     ],
                   ),
@@ -45,21 +40,13 @@ class LandingPage extends StatelessWidget {
                   const Text(
                     'Discover\nLocal Experiences',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      height: 1.2,
-                    ),
+                    style: AppTextStyles.landingTitle,
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    'Explore authentic community tours in Rwanda',
+                    'Explore Authentic Community Tours in Rwanda',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                    ),
+                    style: AppTextStyles.landingSubtitle,
                   ),
                   const SizedBox(height: 48),
                   ElevatedButton(
@@ -75,7 +62,7 @@ class LandingPage extends StatelessWidget {
                     ),
                     child: const Text(
                       'Log In',
-                      style: TextStyle(color: Colors.black),
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
