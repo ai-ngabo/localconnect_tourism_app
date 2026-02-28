@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -9,7 +10,6 @@ class LoginPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Image (same as landing page or similar)
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -47,19 +47,13 @@ class LoginPage extends StatelessWidget {
                     children: [
                       const Text(
                         'Log In',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AppTextStyles.cardTitle,
                       ),
                       const SizedBox(height: 8),
                       const Text(
                         'Access Your Account to\nbook local tours',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 14,
-                        ),
+                        style: AppTextStyles.cardSubtitle,
                       ),
                       const SizedBox(height: 32),
                       const TextField(
@@ -85,14 +79,14 @@ class LoginPage extends StatelessWidget {
                           },
                           child: const Text(
                             'Forgot Password?',
-                            style: TextStyle(color: AppColors.primary),
+                            style: AppTextStyles.linkText,
                           ),
                         ),
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
-                           // Navigate to Home/Tourism Features
+                           // Navigate to Home
                         },
                         child: const Text('Log In'),
                       ),
