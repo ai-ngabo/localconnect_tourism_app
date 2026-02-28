@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -9,7 +10,6 @@ class RegisterPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Image
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -48,19 +48,13 @@ class RegisterPage extends StatelessWidget {
                       children: [
                         const Text(
                           'Sign Up',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AppTextStyles.cardTitle,
                         ),
                         const SizedBox(height: 8),
                         const Text(
                           'Create an account to\nexplore local experiences',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 14,
-                          ),
+                          style: AppTextStyles.cardSubtitle,
                         ),
                         const SizedBox(height: 32),
                         const TextField(
@@ -110,10 +104,7 @@ class RegisterPage extends StatelessWidget {
                               onTap: () => Navigator.pushReplacementNamed(context, '/login'),
                               child: const Text(
                                 'Log In',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
-                                ),
+                                style: AppTextStyles.linkText,
                               ),
                             ),
                           ],
