@@ -3,6 +3,8 @@ import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/pages/login_page.dart';
 import 'features/auth/presentation/pages/register_page.dart';
 import 'features/auth/presentation/pages/landing_page.dart';
+import 'features/auth/presentation/pages/splash_screen.dart';
+import 'features/auth/presentation/pages/forgot_password_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,9 +21,11 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       initialRoute: '/',
       routes: {
-        '/': (context) => const LandingPage(),
+        '/': (context) => const SplashScreen(),
+        '/landing': (context) => const LandingPage(),
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage(),
+        '/forgot-password': (context) => const ForgotPasswordPage(),
       },
     );
   }
