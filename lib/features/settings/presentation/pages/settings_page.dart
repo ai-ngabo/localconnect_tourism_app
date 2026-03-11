@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/providers/language_provider.dart';
 import '../../../../core/providers/notification_provider.dart';
+import '../../../../core/providers/user_provider.dart';
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/utils/responsive.dart';
 import 'profile_page.dart';
@@ -107,7 +108,12 @@ class SettingsPage extends StatelessWidget {
                             Theme.of(context).colorScheme.error,
                       ),
                       onPressed: () {
-                        // TODO: Implement logout
+                        context.read<UserProvider>().logout();
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          '/landing',
+                          (route) => false,
+                        );
                       },
                       child: Text(
                         AppStrings.getText('logout', languageCode),

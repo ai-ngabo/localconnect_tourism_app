@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/language_provider.dart';
-import '../../../../core/providers/theme_provider.dart';
-import '../../../../core/localization/app_strings.dart';
+import '../../../../core/providers/user_provider.dart';
 import '../../../../core/utils/responsive.dart';
 import '../widgets/tour_card.dart';
 import '../../../settings/presentation/pages/settings_page.dart';
@@ -19,9 +18,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final languageCode =
-        context.watch<LanguageProvider>().languageCode;
-    final isMobile = ResponsiveUtil.isMobile(context);
+    context.watch<LanguageProvider>().languageCode;
 
     return Scaffold(
       appBar: AppBar(
@@ -114,6 +111,10 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildProfileTab(BuildContext context) {
     final isMobile = ResponsiveUtil.isMobile(context);
+    final user = context.watch<UserProvider>();
+    final userName = user.name.isNotEmpty ? user.name : 'User';
+    final userEmail = user.email.isNotEmpty ? user.email : 'No email';
+    final initials = user.initials;
 
     return Center(
       child: Padding(
@@ -124,8 +125,8 @@ class _HomePageState extends State<HomePage> {
             CircleAvatar(
               radius: 60,
               backgroundColor: Theme.of(context).primaryColor,
-              child: const Text(
-                'JD',
+              child: Text(
+                initials,
                 style: TextStyle(
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
@@ -135,12 +136,12 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 24),
             Text(
-              'John Doe',
+              userName,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
             Text(
-              'john.doe@example.com',
+              userEmail,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 32),

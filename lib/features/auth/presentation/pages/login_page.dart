@@ -1,9 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/providers/user_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _handleLogin() {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter email and password')),
+      );
+      return;
+    }
+
+    final userProvider = context.read<UserProvider>();
+    final currentName = userProvider.name.isNotEmpty ? userProvider.name : 'User';
+
+    userProvider.login(name: currentName, email: email);
+    Navigator.pushReplacementNamed(context, '/home');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,14 +111,16 @@ class LoginPage extends StatelessWidget {
                                       style: AppTextStyles.cardSubtitle,
                                     ),
                                     const SizedBox(height: 32),
-                                    const TextField(
+                                    TextField(
+                                      controller: _emailController,
                                       decoration: InputDecoration(
                                         hintText: 'Email',
                                         prefixIcon: Icon(Icons.email_outlined),
                                       ),
                                     ),
                                     const SizedBox(height: 16),
-                                    const TextField(
+                                    TextField(
+                                      controller: _passwordController,
                                       obscureText: true,
                                       decoration: InputDecoration(
                                         hintText: 'Password',
@@ -105,9 +142,7 @@ class LoginPage extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 16),
                                     ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.pushReplacementNamed(context, '/home');
-                                      },
+                                      onPressed: _handleLogin,
                                       child: const Text('Log In'),
                                     ),
                                     const SizedBox(height: 16),

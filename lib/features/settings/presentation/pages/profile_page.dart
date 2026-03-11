@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/providers/language_provider.dart';
-import '../../../../core/providers/notification_provider.dart';
+import '../../../../core/providers/user_provider.dart';
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/utils/responsive.dart';
 import 'edit_profile_page.dart';
@@ -15,9 +15,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // Mock user data
-  String userName = 'John Doe';
-  String userEmail = 'john.doe@example.com';
   String userPhone = '+250 798 123 456';
   String userLocation = 'Kigali, Rwanda';
   String userBio = 'Tourism enthusiast exploring Rwanda';
@@ -25,10 +22,13 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.watch<ThemeProvider>().isDarkMode;
+    final user = context.watch<UserProvider>();
+    final userName = user.name.isNotEmpty ? user.name : 'User';
+    final userEmail = user.email.isNotEmpty ? user.email : 'No email';
+    final userInitials = user.initials;
     final languageCode =
         context.watch<LanguageProvider>().languageCode;
     final isMobile = ResponsiveUtil.isMobile(context);
-    final screenWidth = ResponsiveUtil.getScreenWidth(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -52,7 +52,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     radius: isMobile ? 50 : 60,
                     backgroundColor: Theme.of(context).primaryColor,
                     child: Text(
-                      'JD',
+                      userInitials,
                       style: TextStyle(
                         fontSize: isMobile ? 32 : 40,
                         fontWeight: FontWeight.bold,
@@ -100,12 +100,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               userBio: userBio,
                               onSave: (name, email, phone, location, bio) {
                                 setState(() {
-                                  userName = name;
-                                  userEmail = email;
                                   userPhone = phone;
                                   userLocation = location;
                                   userBio = bio;
                                 });
+                                context.read<UserProvider>().updateProfile(
+                                      name: name,
+                                      email: email,
+                                    );
                                 Navigator.pop(context);
                               },
                             ),
