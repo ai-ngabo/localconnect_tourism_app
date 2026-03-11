@@ -110,7 +110,7 @@ class RegisterPage extends StatelessWidget {
                                     const SizedBox(height: 32),
                                     ElevatedButton(
                                       onPressed: () {
-                                        // TODO: Registration logic
+                                        Navigator.pushReplacementNamed(context, '/home');
                                       },
                                       child: const Text('Sign Up'),
                                     ),

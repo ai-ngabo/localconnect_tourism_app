@@ -106,7 +106,7 @@ class LoginPage extends StatelessWidget {
                                     const SizedBox(height: 16),
                                     ElevatedButton(
                                       onPressed: () {
-                                        // TODO: Log In logic
+                                        Navigator.pushReplacementNamed(context, '/home');
                                       },
                                       child: const Text('Log In'),
                                     ),
