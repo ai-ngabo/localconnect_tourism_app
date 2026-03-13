@@ -18,38 +18,50 @@ class LoginPage extends StatelessWidget {
               fit: BoxFit.cover,
               color: Colors.black26,
               colorBlendMode: BlendMode.darken,
-              errorBuilder: (context, error, stackTrace) => Container(color: AppColors.primary),
+              errorBuilder: (context, error, stackTrace) =>
+                  Container(color: AppColors.primary),
             ),
           ),
-          
+
           SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
                     child: IntrinsicHeight(
                       child: Column(
                         children: [
                           // Back Button Row
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 8.0,
+                            ),
                             child: Row(
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                                  icon: const Icon(
+                                    Icons.arrow_back,
+                                    color: Colors.white,
+                                  ),
                                   onPressed: () => Navigator.pop(context),
                                 ),
                               ],
                             ),
                           ),
-                          
+
                           // Centered Form
                           Expanded(
                             child: Center(
                               child: Container(
                                 width: double.infinity,
-                                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 20,
+                                ),
                                 padding: const EdgeInsets.all(24),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -95,7 +107,10 @@ class LoginPage extends StatelessWidget {
                                       alignment: Alignment.centerRight,
                                       child: TextButton(
                                         onPressed: () {
-                                          Navigator.pushNamed(context, '/forgot-password');
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/forgot-password',
+                                          );
                                         },
                                         child: const Text(
                                           'Forgot Password?',
@@ -106,17 +121,24 @@ class LoginPage extends StatelessWidget {
                                     const SizedBox(height: 16),
                                     ElevatedButton(
                                       onPressed: () {
-                                        // TODO: Log In logic
+                                        Navigator.pushReplacementNamed(
+                                          context,
+                                          '/home',
+                                        );
                                       },
                                       child: const Text('Log In'),
                                     ),
                                     const SizedBox(height: 16),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         const Text("Don't have an account? "),
                                         GestureDetector(
-                                          onTap: () => Navigator.pushNamed(context, '/register'),
+                                          onTap: () => Navigator.pushNamed(
+                                            context,
+                                            '/register',
+                                          ),
                                           child: const Text(
                                             'Sign Up',
                                             style: TextStyle(
@@ -130,7 +152,10 @@ class LoginPage extends StatelessWidget {
                                     const SizedBox(height: 24),
                                     OutlinedButton.icon(
                                       onPressed: () {},
-                                      icon: const Icon(Icons.g_mobiledata, size: 30),
+                                      icon: const Icon(
+                                        Icons.g_mobiledata,
+                                        size: 30,
+                                      ),
                                       label: const Text('Continue with Google'),
                                     ),
                                   ],
