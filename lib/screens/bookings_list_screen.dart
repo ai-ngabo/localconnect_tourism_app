@@ -5,8 +5,24 @@ import '../models/tour_model.dart';
 import '../models/booking_store.dart';
 import '../models/user_model.dart';
 
-class BookingsListScreen extends StatelessWidget {
+class BookingsListScreen extends StatefulWidget {
   const BookingsListScreen({super.key});
+
+  @override
+  State<BookingsListScreen> createState() => _BookingsListScreenState();
+}
+
+class _BookingsListScreenState extends State<BookingsListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _updatePastBookings();
+  }
+
+  Future<void> _updatePastBookings() async {
+    final user = UserSession.currentUser;
+    await BookingStore.updatePastBookings(user);
+  }
 
   @override
   Widget build(BuildContext context) {

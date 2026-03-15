@@ -29,4 +29,30 @@ class BookingStore {
               .toList(),
         );
   }
+
+  /// Update status of past bookings to 'Completed'.
+  static Future<void> updatePastBookings(User? user) async {
+    if (user == null || user.email.isEmpty) return;
+
+    final now = DateTime.now();
+    final querySnapshot = await _bookingsRef
+        .where('userEmail', isEqualTo: user.email)
+        .where('status', isEqualTo: 'Confirmed')
+        .get();
+
+    for (final doc in querySnapshot.docs) {
+      final data = doc.data();
+      final dateValue = data['date'];
+      DateTime bookingDate;
+      if (dateValue is Timestamp) {
+        bookingDate = dateValue.toDate();
+      } else {
+        continue;
+      }
+
+      if (bookingDate.isBefore(now)) {
+        await doc.reference.update({'status': 'Completed'});
+      }
+    }
+  }
 }
