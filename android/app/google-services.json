@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "598692532665",
+    "project_id": "tourismapp-9595d",
+    "storage_bucket": "tourismapp-9595d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:598692532665:android:8bd8d6df8ec5a30349e668",
+        "android_client_info": {
+          "package_name": "com.example.community_touring_rwanda"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5Y52E9-EGQTMo9vwLb-keEyl67VGUE4A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

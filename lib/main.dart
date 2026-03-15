@@ -13,12 +13,23 @@ import 'features/auth/presentation/pages/forgot_password_page.dart';
 import 'features/settings/presentation/pages/settings_page.dart';
 import 'features/home/presentation/pages/home_page.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await UserSession.loadFromFirebase();
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
+  runApp(const CommunityTouringRwandaApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class CommunityTouringRwandaApp extends StatelessWidget {
+  const CommunityTouringRwandaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
