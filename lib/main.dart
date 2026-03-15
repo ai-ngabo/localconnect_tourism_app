@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'screens/splash_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/signup_screen.dart';
-import 'utils/app_constants.dart';
-import 'models/user_model.dart';
-import 'screens/home_screen.dart';
-import 'screens/tour_detail_screen.dart';
-import 'screens/booking_screen.dart';
-import 'screens/bookings_list_screen.dart';
-import 'screens/profile_screen.dart';
-import 'screens/edit_profile_screen.dart';
-import 'screens/all_tours_screen.dart';
-import 'screens/all_guides_screen.dart';
-import 'screens/favorites_screen.dart';
-import 'screens/settings_screen.dart';
-import 'screens/support_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:provider/provider.dart';
+import 'core/theme/app_theme.dart';
+import 'core/providers/theme_provider.dart';
+import 'core/providers/language_provider.dart';
+import 'core/providers/notification_provider.dart';
+import 'core/providers/user_provider.dart';
+import 'features/auth/presentation/pages/login_page.dart';
+import 'features/auth/presentation/pages/register_page.dart';
+import 'features/auth/presentation/pages/landing_page.dart';
+import 'features/auth/presentation/pages/splash_screen.dart';
+import 'features/auth/presentation/pages/forgot_password_page.dart';
+import 'features/settings/presentation/pages/settings_page.dart';
+import 'features/home/presentation/pages/home_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,78 +33,34 @@ class CommunityTouringRwandaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: AppStrings.appName,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: AppColors.primary,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          primary: AppColors.primary,
-          secondary: AppColors.secondary,
-        ),
-        scaffoldBackgroundColor: Colors.white,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black),
-          titleTextStyle: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            textStyle: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: Colors.grey.shade100,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey.shade300),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.primary, width: 2),
-          ),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        ),
-        useMaterial3: true,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            title: 'LocalConnect Rwanda',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            initialRoute: '/',
+            routes: {
+              '/': (context) => const SplashScreen(),
+              '/landing': (context) => const LandingPage(),
+              '/login': (context) => const LoginPage(),
+              '/register': (context) => const RegisterPage(),
+              '/forgot-password': (context) => const ForgotPasswordPage(),
+              '/settings': (context) => const SettingsPage(),
+              '/home': (context) => const HomePage(),
+            },
+          );
+        },
       ),
-      initialRoute: UserSession.isLoggedIn ? AppRoutes.home : AppRoutes.splash,
-      routes: {
-        AppRoutes.splash: (context) => const SplashScreen(),
-        AppRoutes.login: (context) => const LoginScreen(),
-        AppRoutes.signup: (context) => const SignupScreen(),
-        AppRoutes.home: (context) => const HomeScreen(),
-        AppRoutes.tourDetail: (context) => const TourDetailScreen(),
-        AppRoutes.booking: (context) => const BookingScreen(),
-        AppRoutes.bookingsList: (context) => const BookingsListScreen(),
-        AppRoutes.profile: (context) => const ProfileScreen(),
-        AppRoutes.editProfile: (context) => const EditProfileScreen(),
-        AppRoutes.allTours: (context) => const AllToursScreen(),
-        AppRoutes.allGuides: (context) => const AllGuidesScreen(),
-        AppRoutes.favorites: (context) => const FavoritesScreen(),
-        AppRoutes.settings: (context) => const SettingsScreen(),
-        AppRoutes.support: (context) => const SupportScreen(),
-      },
     );
   }
 }
