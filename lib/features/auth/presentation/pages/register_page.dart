@@ -1,9 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/providers/user_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  void _handleSignUp() {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
+    context.read<UserProvider>().login(name: name, email: email);
+    Navigator.pushReplacementNamed(context, '/home');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,21 +121,24 @@ class RegisterPage extends StatelessWidget {
                                       style: AppTextStyles.cardSubtitle,
                                     ),
                                     const SizedBox(height: 32),
-                                    const TextField(
+                                    TextField(
+                                      controller: _nameController,
                                       decoration: InputDecoration(
                                         hintText: 'Full Name',
                                         prefixIcon: Icon(Icons.person_outline),
                                       ),
                                     ),
                                     const SizedBox(height: 16),
-                                    const TextField(
+                                    TextField(
+                                      controller: _emailController,
                                       decoration: InputDecoration(
                                         hintText: 'Email',
                                         prefixIcon: Icon(Icons.email_outlined),
                                       ),
                                     ),
                                     const SizedBox(height: 16),
-                                    const TextField(
+                                    TextField(
+                                      controller: _passwordController,
                                       obscureText: true,
                                       decoration: InputDecoration(
                                         hintText: 'Password',
@@ -99,7 +147,8 @@ class RegisterPage extends StatelessWidget {
                                       ),
                                     ),
                                     const SizedBox(height: 16),
-                                    const TextField(
+                                    TextField(
+                                      controller: _confirmPasswordController,
                                       obscureText: true,
                                       decoration: InputDecoration(
                                         hintText: 'Confirm Password',
@@ -109,9 +158,7 @@ class RegisterPage extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 32),
                                     ElevatedButton(
-                                      onPressed: () {
-                                        // TODO: Registration logic
-                                      },
+                                      onPressed: _handleSignUp,
                                       child: const Text('Sign Up'),
                                     ),
                                     const SizedBox(height: 16),
