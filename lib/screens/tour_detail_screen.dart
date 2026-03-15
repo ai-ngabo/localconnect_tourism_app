@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../utils/app_constants.dart';
 import '../models/tour_model.dart';
+import '../models/favorites_store.dart';
+import '../models/user_model.dart';
 
 class TourDetailScreen extends StatelessWidget {
   const TourDetailScreen({super.key});
@@ -68,17 +70,54 @@ class TourDetailScreen extends StatelessWidget {
               Positioned(
                 top: MediaQuery.of(context).padding.top + 8,
                 right: 12,
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppColors.black.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.favorite_border,
-                    color: Colors.white,
-                    size: 22,
-                  ),
+                child: StreamBuilder<Set<String>>(
+                  stream: FavoritesStore.favoritesForCurrentUser(),
+                  builder: (context, snapshot) {
+                    final favorites = snapshot.data ?? <String>{};
+                    final isFavorite = favorites.contains(tour.id);
+
+                    return GestureDetector(
+                      onTap: () async {
+                        if (!UserSession.isLoggedIn) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'Please log in to save tours to favorites.'),
+                              backgroundColor: AppColors.primary,
+                            ),
+                          );
+                          Navigator.pushNamed(context, AppRoutes.login);
+                          return;
+                        }
+                        try {
+                          await FavoritesStore.toggleFavorite(
+                            tour.id,
+                            shouldFavorite: !isFavorite,
+                          );
+                        } catch (_) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text('Could not update favorites. Try again.'),
+                              backgroundColor: AppColors.primary,
+                            ),
+                          );
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.black.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

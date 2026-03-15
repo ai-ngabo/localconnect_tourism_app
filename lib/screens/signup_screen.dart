@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../utils/app_constants.dart';
 import '../models/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -17,6 +19,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -27,15 +30,90 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  void _handleSignup() {
-    if (_formKey.currentState?.validate() ?? false) {
-      // register new user and store
-      UserSession.login(User(
-        name: _nameController.text.trim(),
+  Future<void> _handleSignup() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final credential = await fb_auth.FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
-      ));
+        password: _passwordController.text.trim(),
+      );
+
+      final fbUser = credential.user;
+      if (fbUser == null) {
+        throw Exception('Registration failed');
+      }
+
+      final name = _nameController.text.trim();
+
+      await fbUser.updateDisplayName(name);
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(fbUser.uid)
+          .set({
+        'name': name,
+        'email': fbUser.email,
+        'createdAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      // Require verification before entering the app.
+      await fbUser.sendEmailVerification();
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'A verification link has been sent to ${fbUser.email}. '
+            'Please verify your email before logging in.',
+          ),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+
+      // Sign out so user cannot access dashboard until verified.
+      await UserSession.logout();
+
+      if (!mounted) return;
       Navigator.pushNamedAndRemoveUntil(
-          context, AppRoutes.home, (route) => false);
+        context,
+        AppRoutes.login,
+        (route) => false,
+      );
+    } on fb_auth.FirebaseAuthException catch (e) {
+      String message = AppStrings.genericError;
+      if (e.code == 'email-already-in-use') {
+        message = 'An account already exists for that email';
+      } else if (e.code == 'invalid-email') {
+        message = AppStrings.enterValidEmail;
+      } else if (e.code == 'weak-password') {
+        message = AppStrings.passwordMin6;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+    } catch (_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.genericError),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -210,8 +288,19 @@ class _SignupScreenState extends State<SignupScreen> {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: _handleSignup,
-                                child: const Text(AppStrings.signUp),
+                                onPressed: _isLoading ? null : _handleSignup,
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.white),
+                                        ),
+                                      )
+                                    : const Text(AppStrings.signUp),
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -271,8 +360,13 @@ class _SignupScreenState extends State<SignupScreen> {
                               width: double.infinity,
                               child: OutlinedButton.icon(
                                 onPressed: () {
-                                  Navigator.pushNamedAndRemoveUntil(context,
-                                      AppRoutes.home, (route) => false);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          AppStrings.googleSignInComingSoon),
+                                      backgroundColor: AppColors.primary,
+                                    ),
+                                  );
                                 },
                                 icon: const Text(
                                   AppStrings.googleLetter,

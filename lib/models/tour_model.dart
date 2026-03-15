@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Tour {
   final String id;
   final String title;
@@ -125,6 +127,55 @@ class Booking {
     required this.status,
     this.userEmail,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'tourId': tour.id,
+      'tourTitle': tour.title,
+      'tourDescription': tour.description,
+      'tourImageUrl': tour.imageUrl,
+      'tourDuration': tour.duration,
+      'tourPriceRwf': tour.priceRwf,
+      'date': Timestamp.fromDate(date),
+      'guests': guests,
+      'totalCost': totalCost,
+      'status': status,
+      'userEmail': userEmail,
+    };
+  }
+
+  factory Booking.fromMap(String id, Map<String, dynamic> map) {
+    final dateValue = map['date'];
+    DateTime bookingDate;
+    if (dateValue is Timestamp) {
+      bookingDate = dateValue.toDate();
+    } else if (dateValue is DateTime) {
+      bookingDate = dateValue;
+    } else {
+      bookingDate = DateTime.now();
+    }
+
+    final tour = Tour(
+      id: map['tourId'] as String? ?? '1',
+      title: map['tourTitle'] as String? ?? '',
+      description: map['tourDescription'] as String? ?? '',
+      imageUrl: map['tourImageUrl'] as String? ?? 'cultural_village',
+      duration: map['tourDuration'] as String? ?? '',
+      priceRwf: map['tourPriceRwf'] as int? ?? 0,
+      rating: 4.8,
+      category: 'Cultural',
+    );
+
+    return Booking(
+      id: id,
+      tour: tour,
+      date: bookingDate,
+      guests: map['guests'] as int? ?? 1,
+      totalCost: map['totalCost'] as int? ?? 0,
+      status: map['status'] as String? ?? 'Confirmed',
+      userEmail: map['userEmail'] as String?,
+    );
+  }
 
   static List<Booking> sampleBookings = [];
 }

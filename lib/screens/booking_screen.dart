@@ -94,8 +94,26 @@ class _BookingScreenState extends State<BookingScreen> {
             child: const Text(AppStrings.backToHome),
           ),
           ElevatedButton(
-            onPressed: () {
-              // create a booking and save it
+            onPressed: () async {
+              if (!UserSession.isLoggedIn) {
+                Navigator.pop(ctx);
+                Navigator.pushNamed(context, AppRoutes.login);
+                return;
+              }
+
+              final user = UserSession.currentUser;
+              if (user == null) {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please log in to complete your booking'),
+                    backgroundColor: AppColors.primary,
+                  ),
+                );
+                Navigator.pushNamed(context, AppRoutes.login);
+                return;
+              }
+
               final booking = Booking(
                 id: DateTime.now().millisecondsSinceEpoch.toString(),
                 tour: tour,
@@ -104,11 +122,28 @@ class _BookingScreenState extends State<BookingScreen> {
                 guests: _guests,
                 totalCost: totalCost,
                 status: 'Confirmed',
-                userEmail: UserSession.currentUser?.email ?? 'guest',
+                userEmail: user.email,
               );
-              BookingStore.addBooking(booking);
-              Navigator.pop(ctx);
-              Navigator.pushNamed(context, AppRoutes.bookingsList);
+
+              try {
+                await BookingStore.addBooking(booking);
+              } catch (_) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                          'Could not save booking. Please check your connection and try again.'),
+                      backgroundColor: AppColors.primary,
+                    ),
+                  );
+                }
+                return;
+              }
+
+              if (context.mounted) {
+                Navigator.pop(ctx);
+                Navigator.pushNamed(context, AppRoutes.bookingsList);
+              }
             },
             child: const Text(AppStrings.viewBookings),
           ),

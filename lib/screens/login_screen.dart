@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../utils/app_constants.dart';
 import '../models/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -22,13 +25,124 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
-    if (_formKey.currentState?.validate() ?? false) {
-      // create a basic user record and store in session
-      UserSession.login(
-          User(name: 'Guest', email: _emailController.text.trim()));
+  Future<void> _handleLogin() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final credential = await fb_auth.FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      final fbUser = credential.user;
+      if (fbUser == null) {
+        throw Exception('Authentication failed');
+      }
+
+      // Enforce email verification before allowing dashboard access.
+      if (!fbUser.emailVerified) {
+        // Try to (re)send verification email, but don't treat a send failure
+        // as a generic "something went wrong" auth error.
+        try {
+          await fbUser.sendEmailVerification();
+        } catch (_) {
+          // ignore send errors; user may already have a previous verification email
+        }
+
+        await fb_auth.FirebaseAuth.instance.signOut();
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Please verify your email address first. '
+                'We have (re)sent a verification link to ${fbUser.email}.',
+              ),
+              backgroundColor: AppColors.primary,
+            ),
+          );
+        }
+        return;
+      }
+
+      String name = fbUser.displayName ?? '';
+
+      if (name.isEmpty) {
+        try {
+          final doc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(fbUser.uid)
+              .get();
+          if (doc.exists) {
+            final data = doc.data();
+            if (data != null && data['name'] is String) {
+              name = data['name'] as String;
+            }
+          }
+        } catch (_) {
+          // ignore profile load errors
+        }
+      }
+
+      UserSession.login(User(
+        name: name.isNotEmpty ? name : (fbUser.email ?? 'User'),
+        email: fbUser.email ?? _emailController.text.trim(),
+      ));
+
+      if (!mounted) return;
       Navigator.pushNamedAndRemoveUntil(
-          context, AppRoutes.home, (route) => false);
+        context,
+        AppRoutes.home,
+        (route) => false,
+      );
+    } on fb_auth.FirebaseAuthException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'user-not-found':
+          message = AppStrings.userNotFound;
+          break;
+        case 'wrong-password':
+          message = AppStrings.wrongPassword;
+          break;
+        case 'invalid-email':
+          message = AppStrings.enterValidEmail;
+          break;
+        case 'invalid-credential':
+        case 'invalid-login-credentials':
+          message = AppStrings.wrongPassword;
+          break;
+        default:
+          // Fall back to Firebase's own message when available to avoid
+          // an unhelpful generic "something went wrong".
+          message = e.message ?? AppStrings.genericError;
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      }
+    } catch (_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.genericError),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -175,8 +289,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: _handleLogin,
-                                child: const Text(AppStrings.logInTitle),
+                                onPressed: _isLoading ? null : _handleLogin,
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.white),
+                                        ),
+                                      )
+                                    : const Text(AppStrings.logInTitle),
                               ),
                             ),
                             const SizedBox(height: 20),
@@ -236,8 +361,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               width: double.infinity,
                               child: OutlinedButton.icon(
                                 onPressed: () {
-                                  Navigator.pushNamedAndRemoveUntil(context,
-                                      AppRoutes.home, (route) => false);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          AppStrings.googleSignInComingSoon),
+                                      backgroundColor: AppColors.primary,
+                                    ),
+                                  );
                                 },
                                 icon: const Text(
                                   AppStrings.googleLetter,

@@ -1,17 +1,32 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:community_touring_rwanda/models/tour_model.dart';
 import 'package:community_touring_rwanda/models/user_model.dart';
 
 class BookingStore {
   BookingStore._();
 
-  static final List<Booking> bookings = [];
+  static final _bookingsRef =
+      FirebaseFirestore.instance.collection('bookings');
 
-  static void addBooking(Booking booking) {
-    bookings.add(booking);
+  /// Persist a booking to Firestore.
+  static Future<void> addBooking(Booking booking) async {
+    await _bookingsRef.doc(booking.id).set(booking.toMap());
   }
 
-  static List<Booking> bookingsForUser(User? user) {
-    if (user == null) return [];
-    return bookings.where((b) => b.userEmail == user.email).toList();
+  /// Stream bookings for a given user.
+  static Stream<List<Booking>> bookingsForUser(User? user) {
+    if (user == null || user.email.isEmpty) {
+      return const Stream.empty();
+    }
+
+    return _bookingsRef
+        .where('userEmail', isEqualTo: user.email)
+        // No explicit orderBy to avoid composite index requirement / errors.
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Booking.fromMap(doc.id, doc.data()))
+              .toList(),
+        );
   }
 }

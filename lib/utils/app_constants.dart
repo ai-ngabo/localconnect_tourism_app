@@ -107,6 +107,11 @@ class AppStrings {
   static const enterPassword = 'Please enter a password';
   static const passwordMin6 = 'Password must be at least 6 characters';
   static const passwordsMismatch = 'Passwords do not match';
+  static const userNotFound = 'No user found for that email';
+  static const wrongPassword = 'Incorrect password. Please try again';
+  static const genericError = 'Something went wrong. Please try again';
+  static const googleSignInComingSoon =
+      'Google Sign-In will be available soon';
   static const profileUpdated = 'Profile updated';
   static const editProfileComingSoon = 'Edit Profile coming soon';
   static const favoritesComingSoon = 'Favorites coming soon';
