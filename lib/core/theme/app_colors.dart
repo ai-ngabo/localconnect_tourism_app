@@ -13,4 +13,11 @@ class AppColors {
   static const Color cardBackground = Colors.white;
   static const Color inputBorder = Color(0xFFE0E0E0);
   static const Color googleButtonBorder = Color(0xFFE0E0E0);
+
+  // Dark theme colors
+  static const Color darkBg = Color(0xFF121212);
+  static const Color darkCardBg = Color(0xFF1E1E1E);
+  static const Color darkTextPrimary = Color(0xFFE0E0E0);
+  static const Color darkTextSecondary = Color(0xFF999999);
+  static const Color darkInputBorder = Color(0xFF333333);
 }
