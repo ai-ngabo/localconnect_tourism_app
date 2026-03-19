@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import '../utils/app_constants.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../models/tour_model.dart';
-import '../models/booking_store.dart';
+
+import '../features/booking/domain/entities/booking_entity.dart';
+import '../features/booking/presentation/cubit/bookings_list_cubit.dart';
 import '../models/user_model.dart';
+import '../utils/app_constants.dart';
 
 class BookingsListScreen extends StatefulWidget {
   const BookingsListScreen({super.key});
@@ -16,12 +18,8 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
   @override
   void initState() {
     super.initState();
-    _updatePastBookings();
-  }
-
-  Future<void> _updatePastBookings() async {
-    final user = UserSession.currentUser;
-    await BookingStore.updatePastBookings(user);
+    final email = UserSession.currentUser?.email ?? '';
+    context.read<BookingsListCubit>().watchBookings(email);
   }
 
   @override
@@ -33,8 +31,6 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
       return const Scaffold();
     }
 
-    final user = UserSession.currentUser;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(AppStrings.bookings),
@@ -44,71 +40,54 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: StreamBuilder<List<Booking>>(
-        stream: BookingStore.bookingsForUser(user),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      body: BlocBuilder<BookingsListCubit, BookingsListState>(
+        builder: (context, state) {
+          if (state is BookingsListLoading || state is BookingsListInitial) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (snapshot.hasError) {
+          if (state is BookingsListError) {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
                   'Could not load your bookings. Please try again.',
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
               ),
             );
           }
 
-          final userBookings = snapshot.data ?? [];
-          final upcomingBookings =
-              userBookings.where((b) => b.status == 'Confirmed').toList();
-          final pastBookings =
-              userBookings.where((b) => b.status == 'Completed').toList();
-
+          final loaded = state as BookingsListLoaded;
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Upcoming section
-                const Text(
-                  AppStrings.upcoming,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
+                const Text(AppStrings.upcoming,
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87)),
                 const SizedBox(height: 14),
-                if (upcomingBookings.isEmpty)
+                if (loaded.upcoming.isEmpty)
                   _buildEmptyState(AppStrings.noUpcomingBookings)
                 else
-                  ...upcomingBookings.map((booking) =>
-                      _buildBookingCard(context, booking, isUpcoming: true)),
+                  ...loaded.upcoming.map(
+                      (b) => _buildBookingCard(context, b, isUpcoming: true)),
                 const SizedBox(height: 28),
-                // Past section
-                const Text(
-                  AppStrings.past,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
+                const Text(AppStrings.past,
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87)),
                 const SizedBox(height: 14),
-                if (pastBookings.isEmpty)
+                if (loaded.past.isEmpty)
                   _buildEmptyState(AppStrings.noPastBookings)
                 else
-                  ...pastBookings.map((booking) =>
-                      _buildBookingCard(context, booking, isUpcoming: false)),
+                  ...loaded.past.map(
+                      (b) => _buildBookingCard(context, b, isUpcoming: false)),
               ],
             ),
           );
@@ -129,31 +108,21 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
         children: [
           Icon(Icons.calendar_today, size: 36, color: Colors.grey.shade400),
           const SizedBox(height: 10),
-          Text(
-            message,
-            style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
-          ),
+          Text(message,
+              style: TextStyle(color: Colors.grey.shade500, fontSize: 14)),
         ],
       ),
     );
   }
 
-  Widget _buildBookingCard(BuildContext context, Booking booking,
+  Widget _buildBookingCard(BuildContext context, BookingEntity booking,
       {required bool isUpcoming}) {
     final tourGradients = AppStyles.tourGradients;
-
-    final Map<String, IconData> tourIcons = {
-      '1': Icons.holiday_village,
-      '2': Icons.eco,
-      '3': Icons.terrain,
-      '4': Icons.sailing,
-    };
+    final tourIcons = AppStyles.tourIcons;
 
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, AppRoutes.tourDetail,
-            arguments: booking.tour);
-      },
+      onTap: () => Navigator.pushNamed(context, AppRoutes.tourDetail,
+          arguments: booking.tour),
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
         decoration: BoxDecoration(
@@ -161,7 +130,7 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: AppColors.grey.withOpacity(0.12),
+              color: Colors.grey.withValues(alpha: 0.12),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -170,7 +139,6 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
             Container(
               height: 140,
               width: double.infinity,
@@ -190,23 +158,18 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                 child: Icon(
                   tourIcons[booking.tour.id] ?? Icons.tour,
                   size: 50,
-                  color: AppColors.white.withOpacity(0.5),
+                  color: Colors.white.withValues(alpha: 0.5),
                 ),
               ),
             ),
-            // Info
             Padding(
               padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    booking.tour.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text(booking.tour.title,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 6),
                   Row(
                     children: [
@@ -216,28 +179,25 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                       Text(
                         '${AppStrings.date} ${DateFormat('MMM dd, yyyy').format(booking.date)}',
                         style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade600,
-                        ),
+                            fontSize: 13, color: Colors.grey.shade600),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  // Status badge
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
-                      color: isUpcoming ? AppColors.success : AppColors.danger,
+                      color:
+                          isUpcoming ? AppColors.success : AppColors.danger,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       booking.status,
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
