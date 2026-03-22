@@ -258,13 +258,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 width: double.infinity,
                                 child: OutlinedButton.icon(
                                   onPressed: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            AppStrings.googleSignInComingSoon),
-                                        backgroundColor: AppColors.primary,
-                                      ),
-                                    );
+                                    context
+                                        .read<AuthBloc>()
+                                        .add(const GoogleSignInRequested());
                                   },
                                   icon: const Text(AppStrings.googleLetter,
                                       style: TextStyle(

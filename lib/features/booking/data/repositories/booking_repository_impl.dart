@@ -50,6 +50,11 @@ class BookingRepositoryImpl implements BookingRepository {
     }
   }
 
+  @override
+  Future<void> cancelBooking(String bookingId) async {
+    await _bookingsRef.doc(bookingId).delete();
+  }
+
   Map<String, dynamic> _toMap(BookingEntity booking) {
     return {
       'tourId': booking.tour.id,

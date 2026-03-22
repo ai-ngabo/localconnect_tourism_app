@@ -27,7 +27,7 @@ class AllGuidesScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.grey.withOpacity(0.12),
+                  color: AppColors.grey.withValues(alpha: 0.12),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),

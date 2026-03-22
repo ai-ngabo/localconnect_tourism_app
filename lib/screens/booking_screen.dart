@@ -59,7 +59,7 @@ class _BookingScreenState extends State<BookingScreen> {
           children: [
             Icon(Icons.check_circle, color: AppColors.primary, size: 28),
             SizedBox(width: 10),
-            Text(AppStrings.bookingConfirmed),
+            Expanded(child: Text(AppStrings.bookingConfirmed)),
           ],
         ),
         content: Column(
@@ -201,7 +201,7 @@ class _BookingScreenState extends State<BookingScreen> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Icon(tourIcons[tour.id] ?? Icons.tour,
-                            color: AppColors.white.withOpacity(0.7), size: 36),
+                            color: AppColors.white.withValues(alpha: 0.7), size: 36),
                       ),
                       const SizedBox(width: 16),
                       Expanded(

@@ -20,3 +20,13 @@ class UpdatePastBookingsUseCase {
     return repository.updatePastBookings(userEmail);
   }
 }
+
+class CancelBookingUseCase {
+  final BookingRepository repository;
+
+  CancelBookingUseCase(this.repository);
+
+  Future<void> call(String bookingId) {
+    return repository.cancelBooking(bookingId);
+  }
+}

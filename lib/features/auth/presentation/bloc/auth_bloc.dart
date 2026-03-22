@@ -21,6 +21,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignInRequested>(_onSignIn);
     on<SignUpRequested>(_onSignUp);
     on<SignOutRequested>(_onSignOut);
+    on<GoogleSignInRequested>(_onGoogleSignIn);
   }
 
   Future<void> _onSignIn(SignInRequested event, Emitter<AuthState> emit) async {
@@ -79,6 +80,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onSignOut(SignOutRequested event, Emitter<AuthState> emit) async {
     await signOutUseCase(NoParams());
     emit(const AuthUnauthenticated());
+  }
+
+  Future<void> _onGoogleSignIn(
+      GoogleSignInRequested event, Emitter<AuthState> emit) async {
+    emit(const AuthLoading());
+    try {
+      final user = await signInUseCase.repository.signInWithGoogle();
+      emit(AuthAuthenticated(user));
+    } on fb_auth.FirebaseAuthException catch (e) {
+      emit(AuthError(_mapFirebaseAuthError(e)));
+    } catch (e) {
+      final msg = e.toString();
+      if (msg.contains('cancelled')) {
+        emit(const AuthInitial());
+      } else {
+        emit(AuthError(msg.replaceFirst('Exception: ', '')));
+      }
+    }
   }
 
   String _mapFirebaseAuthError(fb_auth.FirebaseAuthException e) {

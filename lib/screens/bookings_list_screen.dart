@@ -96,6 +96,31 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
     );
   }
 
+  void _showCancelDialog(BuildContext context, String bookingId) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cancel Booking'),
+        content: const Text(
+            'Are you sure you want to cancel this booking? This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Keep'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              context.read<BookingsListCubit>().cancelBooking(bookingId);
+            },
+            child: const Text('Cancel Booking',
+                style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildEmptyState(String message) {
     return Container(
       padding: const EdgeInsets.all(24),
@@ -184,21 +209,42 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 6),
-                    decoration: BoxDecoration(
-                      color:
-                          isUpcoming ? AppColors.success : AppColors.danger,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      booking.status,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600),
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isUpcoming
+                              ? AppColors.success
+                              : AppColors.danger,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          booking.status,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      if (isUpcoming) ...[
+                        const Spacer(),
+                        TextButton.icon(
+                          onPressed: () =>
+                              _showCancelDialog(context, booking.id),
+                          icon: const Icon(Icons.cancel_outlined,
+                              size: 16, color: Colors.red),
+                          label: const Text('Cancel',
+                              style: TextStyle(
+                                  color: Colors.red, fontSize: 13)),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),

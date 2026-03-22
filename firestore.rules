@@ -9,10 +9,12 @@ service cloud.firestore {
         && request.auth.uid == userId;
     }
 
-    // Bookings: for this app, allow any authenticated user to
-    // create/read/update/delete only while signed in.
+    // Bookings: users can only read/write their own bookings.
     match /bookings/{bookingId} {
-      allow read, write: if request.auth != null;
+      allow read, update, delete: if request.auth != null
+        && resource.data.userEmail == request.auth.token.email;
+      allow create: if request.auth != null
+        && request.resource.data.userEmail == request.auth.token.email;
     }
 
     // Favorites stored under /favorites/{userId}.

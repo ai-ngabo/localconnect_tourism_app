@@ -61,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: AppColors.grey.withOpacity(0.2),
+              color: AppColors.grey.withValues(alpha: 0.2),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -267,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: AppColors.grey.withOpacity(0.15),
+              color: AppColors.grey.withValues(alpha: 0.15),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -292,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Icon(
                     tourIcons[tour.id] ?? Icons.tour,
                     size: 44,
-                    color: AppColors.white.withOpacity(0.8),
+                    color: AppColors.white.withValues(alpha: 0.8),
                   ),
                 ),
               ),
@@ -348,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.grey.withOpacity(0.12),
+            color: AppColors.grey.withValues(alpha: 0.12),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -460,7 +460,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: AppColors.grey.withOpacity(0.1),
+              color: AppColors.grey.withValues(alpha: 0.1),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -477,7 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(tourIcons[tour.id] ?? Icons.tour,
-                  color: AppColors.white.withOpacity(0.8), size: 30),
+                  color: AppColors.white.withValues(alpha: 0.8), size: 30),
             ),
             const SizedBox(width: 14),
             Expanded(

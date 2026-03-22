@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../domain/entities/user_entity.dart';
 
@@ -7,6 +8,7 @@ abstract class AuthRemoteDataSource {
   Future<UserEntity> signIn({required String email, required String password});
   Future<void> signUp({required String name, required String email, required String password});
   Future<void> signOut();
+  Future<UserEntity> signInWithGoogle();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -81,5 +83,35 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> signOut() async {
     await firebaseAuth.signOut();
+    await GoogleSignIn().signOut();
+  }
+
+  @override
+  Future<UserEntity> signInWithGoogle() async {
+    final googleUser = await GoogleSignIn().signIn();
+    if (googleUser == null) throw Exception('Google sign-in cancelled');
+
+    final googleAuth = await googleUser.authentication;
+    final credential = fb_auth.GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final userCredential =
+        await firebaseAuth.signInWithCredential(credential);
+    final fbUser = userCredential.user;
+    if (fbUser == null) throw Exception('Authentication failed');
+
+    // Persist user profile to Firestore (merge so existing data is kept)
+    await firestore.collection('users').doc(fbUser.uid).set({
+      'name': fbUser.displayName ?? googleUser.displayName ?? '',
+      'email': fbUser.email ?? '',
+    }, SetOptions(merge: true));
+
+    return UserEntity(
+      uid: fbUser.uid,
+      name: fbUser.displayName ?? googleUser.displayName ?? fbUser.email ?? 'User',
+      email: fbUser.email ?? '',
+    );
   }
 }

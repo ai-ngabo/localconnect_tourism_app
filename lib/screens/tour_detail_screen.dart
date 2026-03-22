@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../features/settings/presentation/cubit/favorites_cubit.dart';
+import '../features/tourism/domain/entities/tour_entity.dart';
 import '../utils/app_constants.dart';
-import '../models/tour_model.dart';
-import '../models/favorites_store.dart';
 import '../models/user_model.dart';
 
 class TourDetailScreen extends StatelessWidget {
@@ -9,8 +11,14 @@ class TourDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tour = ModalRoute.of(context)?.settings.arguments as Tour? ??
-        Tour.sampleTours[0];
+    final tour = ModalRoute.of(context)?.settings.arguments as TourEntity?;
+
+    if (tour == null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: const Center(child: Text('Tour not found.')),
+      );
+    }
 
     final tourGradients = AppStyles.tourGradients;
 
@@ -42,7 +50,7 @@ class TourDetailScreen extends StatelessWidget {
                   child: Icon(
                     tourIcons[tour.id] ?? Icons.tour,
                     size: 80,
-                    color: AppColors.white.withOpacity(0.5),
+                    color: AppColors.white.withValues(alpha: 0.5),
                   ),
                 ),
               ),
@@ -55,7 +63,7 @@ class TourDetailScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.black.withOpacity(0.3),
+                      color: AppColors.black.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -70,14 +78,15 @@ class TourDetailScreen extends StatelessWidget {
               Positioned(
                 top: MediaQuery.of(context).padding.top + 8,
                 right: 12,
-                child: StreamBuilder<Set<String>>(
-                  stream: FavoritesStore.favoritesForCurrentUser(),
-                  builder: (context, snapshot) {
-                    final favorites = snapshot.data ?? <String>{};
-                    final isFavorite = favorites.contains(tour.id);
+                child: BlocBuilder<FavoritesCubit, FavoritesState>(
+                  builder: (context, favState) {
+                    final favoriteIds = favState is FavoritesLoaded
+                        ? favState.favoriteIds
+                        : <String>{};
+                    final isFavorite = favoriteIds.contains(tour.id);
 
                     return GestureDetector(
-                      onTap: () async {
+                      onTap: () {
                         if (!UserSession.isLoggedIn) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -89,25 +98,15 @@ class TourDetailScreen extends StatelessWidget {
                           Navigator.pushNamed(context, AppRoutes.login);
                           return;
                         }
-                        try {
-                          await FavoritesStore.toggleFavorite(
-                            tour.id,
-                            shouldFavorite: !isFavorite,
-                          );
-                        } catch (_) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text('Could not update favorites. Try again.'),
-                              backgroundColor: AppColors.primary,
-                            ),
-                          );
-                        }
+                        context
+                            .read<FavoritesCubit>()
+                            .toggleFavorite(tour.id,
+                                shouldFavorite: !isFavorite);
                       },
                       child: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: AppColors.black.withOpacity(0.3),
+                          color: AppColors.black.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
@@ -238,7 +237,7 @@ class TourDetailScreen extends StatelessWidget {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.grey.withOpacity(0.15),
+                  color: AppColors.grey.withValues(alpha: 0.15),
                   blurRadius: 10,
                   offset: const Offset(0, -3),
                 ),

@@ -84,6 +84,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => AddBookingUseCase(sl()));
   sl.registerLazySingleton(() => GetBookingsUseCase(sl()));
   sl.registerLazySingleton(() => UpdatePastBookingsUseCase(sl()));
+  sl.registerLazySingleton(() => CancelBookingUseCase(sl()));
   sl.registerFactory(
     () => BookingFormCubit(addBookingUseCase: sl()),
   );
@@ -91,6 +92,7 @@ Future<void> initDependencies() async {
     () => BookingsListCubit(
       getBookingsUseCase: sl(),
       updatePastBookingsUseCase: sl(),
+      cancelBookingUseCase: sl(),
     ),
   );
 

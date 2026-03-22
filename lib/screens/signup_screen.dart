@@ -272,13 +272,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                 width: double.infinity,
                                 child: OutlinedButton.icon(
                                   onPressed: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            AppStrings.googleSignInComingSoon),
-                                        backgroundColor: AppColors.primary,
-                                      ),
-                                    );
+                                    context
+                                        .read<AuthBloc>()
+                                        .add(const GoogleSignInRequested());
                                   },
                                   icon: const Text(AppStrings.googleLetter,
                                       style: TextStyle(

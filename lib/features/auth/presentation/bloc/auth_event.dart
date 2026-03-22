@@ -35,3 +35,7 @@ class SignUpRequested extends AuthEvent {
 class SignOutRequested extends AuthEvent {
   const SignOutRequested();
 }
+
+class GoogleSignInRequested extends AuthEvent {
+  const GoogleSignInRequested();
+}

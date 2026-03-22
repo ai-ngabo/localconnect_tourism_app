@@ -12,7 +12,20 @@
           "package_name": "com.example.community_touring_rwanda"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "598692532665-f6irakil1ncvhr94aba7mr4uli8j4bch.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.community_touring_rwanda",
+            "certificate_hash": "fb88117fd947d72d89ae448ff46f771e9af7dd56"
+          }
+        },
+        {
+          "client_id": "598692532665-0p1aahql7d65pjraj01t928pr98rgd9h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD5Y52E9-EGQTMo9vwLb-keEyl67VGUE4A"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "598692532665-0p1aahql7d65pjraj01t928pr98rgd9h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "598692532665-k2kfc06s1s38g7ung2jec6bchohvd0on.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.communityTouringRwanda"
+              }
+            }
+          ]
         }
       }
     }

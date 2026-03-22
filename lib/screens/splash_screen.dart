@@ -44,8 +44,8 @@ class SplashScreen extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.black.withOpacity(0.2),
-                  AppColors.black.withOpacity(0.6),
+                  AppColors.black.withValues(alpha: 0.2),
+                  AppColors.black.withValues(alpha: 0.6),
                 ],
               ),
             ),
@@ -64,7 +64,7 @@ class SplashScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: AppColors.white.withOpacity(0.2),
+                          color: AppColors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
@@ -101,7 +101,7 @@ class SplashScreen extends StatelessWidget {
                   Text(
                     AppStrings.exploreAuthenticTours,
                     style: TextStyle(
-                      color: AppColors.white.withOpacity(0.85),
+                      color: AppColors.white.withValues(alpha: 0.85),
                       fontSize: 16,
                       height: 1.4,
                     ),
@@ -172,7 +172,7 @@ class _NaturePatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppColors.white.withOpacity(0.04)
+      ..color = AppColors.white.withValues(alpha: 0.04)
       ..style = PaintingStyle.fill;
 
     // Draw some leaf-like shapes for nature feel
