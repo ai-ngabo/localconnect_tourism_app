@@ -79,7 +79,3 @@ lib/
 - ✅ Logout with confirmation
 - ✅ Green nature-themed UI matching the design
 - ✅ Placeholder graphics (gradient + icons) — replace with real images
-
-## Customization
-
-To add real images, place them in `assets/images/` and update the image references in the tour cards and detail screens to use `Image.asset()` instead of the gradient containers.
