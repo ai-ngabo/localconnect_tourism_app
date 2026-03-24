@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/usecases/usecase.dart';
+import '../../../../models/user_model.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
 import '../../domain/usecases/sign_out_usecase.dart';
 import '../../domain/usecases/sign_up_usecase.dart';
@@ -77,8 +78,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onSignOut(SignOutRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onSignOut(
+      SignOutRequested event, Emitter<AuthState> emit) async {
     await signOutUseCase(NoParams());
+    await UserSession.logout();
     emit(const AuthUnauthenticated());
   }
 

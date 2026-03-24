@@ -80,18 +80,28 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     await firebaseAuth.signOut();
   }
 
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+
   @override
   Future<void> signOut() async {
     await firebaseAuth.signOut();
-    await GoogleSignIn().signOut();
+    try {
+      await _googleSignIn.signOut();
+      await _googleSignIn.disconnect();
+    } catch (_) {
+      // best effort, ignore any extra signout errors
+    }
   }
 
   @override
   Future<UserEntity> signInWithGoogle() async {
-    final googleUser = await GoogleSignIn().signIn();
+    final googleUser = await _googleSignIn.signIn();
     if (googleUser == null) throw Exception('Google sign-in cancelled');
 
     final googleAuth = await googleUser.authentication;
+    if (googleAuth.accessToken == null || googleAuth.idToken == null) {
+      throw Exception('Google authentication tokens missing');
+    }
     final credential = fb_auth.GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,

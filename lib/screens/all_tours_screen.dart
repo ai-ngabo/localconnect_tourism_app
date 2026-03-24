@@ -83,11 +83,18 @@ class _AllToursScreenState extends State<AllToursScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
-                          child: Icon(
-                            tourIcons[tour.id] ?? Icons.tour,
-                            size: 40,
-                            color: AppColors.white.withValues(alpha: 0.8),
-                          ),
+                          child: AppStyles.tourImages[tour.id] != null
+                              ? Image.asset(
+                                  AppStyles.tourImages[tour.id]!,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                )
+                              : Icon(
+                                  tourIcons[tour.id] ?? Icons.tour,
+                                  size: 40,
+                                  color: AppColors.white.withValues(alpha: 0.8),
+                                ),
                         ),
                       ),
                       const SizedBox(width: 14),

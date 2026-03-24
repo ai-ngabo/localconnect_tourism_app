@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+import 'package:firebase_core/firebase_core.dart' as firebase_core;
 
 class User {
   String name;
@@ -56,7 +57,13 @@ class UserSession {
 
   /// Sign out from Firebase and clear local session.
   static Future<void> logout() async {
-    await fb_auth.FirebaseAuth.instance.signOut();
+    try {
+      if (firebase_core.Firebase.apps.isNotEmpty) {
+        await fb_auth.FirebaseAuth.instance.signOut();
+      }
+    } catch (_) {
+      // ignore errors in test or already signed out state
+    }
     currentUser = null;
   }
 }

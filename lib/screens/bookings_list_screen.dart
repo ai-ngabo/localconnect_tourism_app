@@ -168,24 +168,34 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
               height: 140,
               width: double.infinity,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: tourGradients[booking.tour.id] ??
-                      [AppColors.primaryLight, AppColors.primary],
-                ),
+                image: AppStyles.tourImages[booking.tour.id] != null
+                    ? DecorationImage(
+                        image: AssetImage(AppStyles.tourImages[booking.tour.id]!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+                gradient: AppStyles.tourImages[booking.tour.id] == null
+                    ? LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: tourGradients[booking.tour.id] ??
+                            [AppColors.primaryLight, AppColors.primary],
+                      )
+                    : null,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
                 ),
               ),
-              child: Center(
-                child: Icon(
-                  tourIcons[booking.tour.id] ?? Icons.tour,
-                  size: 50,
-                  color: Colors.white.withValues(alpha: 0.5),
-                ),
-              ),
+              child: AppStyles.tourImages[booking.tour.id] == null
+                  ? Center(
+                      child: Icon(
+                        tourIcons[booking.tour.id] ?? Icons.tour,
+                        size: 50,
+                        color: Colors.white.withValues(alpha: 0.5),
+                      ),
+                    )
+                  : null,
             ),
             Padding(
               padding: const EdgeInsets.all(14),

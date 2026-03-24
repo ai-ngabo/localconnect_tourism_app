@@ -48,7 +48,8 @@ class _BookingScreenState extends State<BookingScreen> {
     }
   }
 
-  void _confirmBooking(BuildContext context, TourEntity tour, BookingFormInitial formState) {
+  void _confirmBooking(
+      BuildContext context, TourEntity tour, BookingFormInitial formState) {
     final totalCost = tour.priceRwf * formState.guests;
 
     showDialog(
@@ -126,8 +127,7 @@ class _BookingScreenState extends State<BookingScreen> {
                         width: 18,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation(Colors.white),
+                          valueColor: AlwaysStoppedAnimation(Colors.white),
                         ),
                       )
                     : const Text(AppStrings.viewBookings),
@@ -200,8 +200,19 @@ class _BookingScreenState extends State<BookingScreen> {
                           ),
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: Icon(tourIcons[tour.id] ?? Icons.tour,
-                            color: AppColors.white.withValues(alpha: 0.7), size: 36),
+                        child: AppStyles.tourImages[tour.id] != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.asset(
+                                  AppStyles.tourImages[tour.id]!,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
+                              )
+                            : Icon(tourIcons[tour.id] ?? Icons.tour,
+                                color: AppColors.white.withValues(alpha: 0.7),
+                                size: 36),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -212,7 +223,8 @@ class _BookingScreenState extends State<BookingScreen> {
                                 style: const TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 4),
-                            Text('${tour.duration} · ${tour.priceRwf} Rwf/person',
+                            Text(
+                                '${tour.duration} · ${tour.priceRwf} Rwf/person',
                                 style: TextStyle(
                                     color: Colors.grey.shade600, fontSize: 13)),
                           ],
@@ -271,8 +283,8 @@ class _BookingScreenState extends State<BookingScreen> {
                           color: Colors.black87)),
                   const SizedBox(height: 10),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(12),
@@ -302,8 +314,9 @@ class _BookingScreenState extends State<BookingScreen> {
                           ),
                         ),
                         IconButton(
-                          onPressed: () =>
-                              context.read<BookingFormCubit>().incrementGuests(),
+                          onPressed: () => context
+                              .read<BookingFormCubit>()
+                              .incrementGuests(),
                           icon: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
@@ -351,12 +364,11 @@ class _BookingScreenState extends State<BookingScreen> {
                     maxLines: 3,
                     decoration: InputDecoration(
                       hintText: 'Any special requests or notes...',
-                      hintStyle: TextStyle(
-                          color: Colors.grey.shade400, fontSize: 14),
+                      hintStyle:
+                          TextStyle(color: Colors.grey.shade400, fontSize: 14),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            BorderSide(color: Colors.grey.shade300),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
                       ),
                     ),
                   ),
