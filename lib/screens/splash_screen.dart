@@ -17,21 +17,16 @@ class SplashScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background image placeholder with gradient
+          // Full-screen background image (replaces green gradient)
           Container(
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  AppColors.backgroundGradient1,
-                  AppColors.backgroundGradient2,
-                  AppColors.backgroundGradient3,
-                ],
+              image: DecorationImage(
+                image: AssetImage('assets/images/kibira.jpg'),
+                fit: BoxFit.cover,
               ),
             ),
           ),
-          // Decorative nature pattern overlay
+          // Decorative nature pattern overlay (optional overlay remains)
           Positioned.fill(
             child: CustomPaint(
               painter: _NaturePatternPainter(),

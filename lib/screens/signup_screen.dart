@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/bloc/auth_event.dart';
 import '../features/auth/presentation/bloc/auth_state.dart';
+import '../models/user_model.dart';
 import '../utils/app_constants.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -44,7 +45,11 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthSignUpSuccess) {
+        if (state is AuthAuthenticated) {
+          UserSession.login(User(name: state.user.name, email: state.user.email));
+          Navigator.pushNamedAndRemoveUntil(
+              context, AppRoutes.home, (route) => false);
+        } else if (state is AuthSignUpSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
               'A verification link has been sent to ${state.email}. '

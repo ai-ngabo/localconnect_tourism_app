@@ -110,8 +110,7 @@ class AppStrings {
   static const userNotFound = 'No user found for that email';
   static const wrongPassword = 'Incorrect password. Please try again';
   static const genericError = 'Something went wrong. Please try again';
-  static const googleSignInComingSoon =
-      'Google Sign-In will be available soon';
+  static const googleSignInComingSoon = 'Google Sign-In will be available soon';
   static const profileUpdated = 'Profile updated';
   static const editProfileComingSoon = 'Edit Profile coming soon';
   static const favoritesComingSoon = 'Favorites coming soon';
@@ -170,6 +169,20 @@ class AppStyles {
     '2': Icons.eco,
     '3': Icons.terrain,
     '4': Icons.sailing,
+  };
+
+  // New image-based replacements for tour/guide icons
+  static Map<String, String> tourImages = {
+    '1': 'assets/images/kibira2.jpg',
+    '2': 'assets/images/gitega.jpg',
+    '3': 'assets/images/Lake_Kivu.jpeg',
+    '4': 'assets/images/canopy.jpeg',
+  };
+
+  static Map<String, String> guideImages = {
+    '1': 'assets/images/Ga1.jpg',
+    '2': 'assets/images/Ga2.jpg',
+    '3': 'assets/images/Ga3.jpg',
   };
 
   static Map<String, Color> guideColors = {

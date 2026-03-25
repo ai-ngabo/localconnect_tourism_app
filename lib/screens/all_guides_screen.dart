@@ -35,14 +35,25 @@ class AllGuidesScreen extends StatelessWidget {
             ),
             child: ListTile(
               leading: Container(
-                padding: const EdgeInsets.all(10),
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
                   color: guideColors[guide.id] ?? AppColors.primary,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  guideIcons[guide.id] ?? Icons.person,
-                  color: AppColors.white,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: AppStyles.guideImages[guide.id] != null
+                      ? Image.asset(
+                          AppStyles.guideImages[guide.id]!,
+                          width: double.infinity,
+                          height: double.infinity,
+                          fit: BoxFit.cover,
+                        )
+                      : Icon(
+                          guideIcons[guide.id] ?? Icons.person,
+                          color: AppColors.white,
+                        ),
                 ),
               ),
               title: Text(

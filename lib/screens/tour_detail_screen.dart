@@ -6,8 +6,20 @@ import '../features/tourism/domain/entities/tour_entity.dart';
 import '../utils/app_constants.dart';
 import '../models/user_model.dart';
 
-class TourDetailScreen extends StatelessWidget {
+class TourDetailScreen extends StatefulWidget {
   const TourDetailScreen({super.key});
+
+  @override
+  State<TourDetailScreen> createState() => _TourDetailScreenState();
+}
+
+class _TourDetailScreenState extends State<TourDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Start watching favorites for the favorite button
+    context.read<FavoritesCubit>().watchFavorites();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +33,6 @@ class TourDetailScreen extends StatelessWidget {
     }
 
     final tourGradients = AppStyles.tourGradients;
-
-    final Map<String, IconData> tourIcons = {
-      '1': Icons.holiday_village,
-      '2': Icons.eco,
-      '3': Icons.terrain,
-      '4': Icons.sailing,
-    };
 
     return Scaffold(
       body: Column(
@@ -47,11 +52,18 @@ class TourDetailScreen extends StatelessWidget {
                   ),
                 ),
                 child: Center(
-                  child: Icon(
-                    tourIcons[tour.id] ?? Icons.tour,
-                    size: 80,
-                    color: AppColors.white.withValues(alpha: 0.5),
-                  ),
+                  child: AppStyles.tourImages[tour.id] != null
+                      ? Image.asset(
+                          AppStyles.tourImages[tour.id]!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        )
+                      : Icon(
+                          AppStyles.tourIcons[tour.id] ?? Icons.tour,
+                          size: 80,
+                          color: AppColors.white.withValues(alpha: 0.5),
+                        ),
                 ),
               ),
               // Back button

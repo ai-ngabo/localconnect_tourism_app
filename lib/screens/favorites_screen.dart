@@ -73,8 +73,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     padding: const EdgeInsets.all(24),
                     child: Text(
                       'You have no favorite tours yet.\nTap the heart icon on a tour to save it here.',
-                      style: TextStyle(
-                          fontSize: 15, color: Colors.grey.shade600),
+                      style:
+                          TextStyle(fontSize: 15, color: Colors.grey.shade600),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -121,11 +121,19 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Center(
-                              child: Icon(
-                                tourIcons[tour.id] ?? Icons.tour,
-                                size: 40,
-                                color: Colors.white.withValues(alpha: 0.8),
-                              ),
+                              child: AppStyles.tourImages[tour.id] != null
+                                  ? Image.asset(
+                                      AppStyles.tourImages[tour.id]!,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Icon(
+                                      tourIcons[tour.id] ?? Icons.tour,
+                                      size: 40,
+                                      color:
+                                          Colors.white.withValues(alpha: 0.8),
+                                    ),
                             ),
                           ),
                           const SizedBox(width: 14),
