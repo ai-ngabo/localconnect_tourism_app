@@ -63,17 +63,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 16),
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: AppColors.primary,
-                    child: state is ProfileLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : Text(initials,
-                            style: const TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white)),
-                  ),
+                  Builder(builder: (context) {
+                    String? photoUrl;
+                    if (state is ProfileLoaded) {
+                      photoUrl = state.profile.photoUrl;
+                    } else if (state is ProfileUpdateSuccess) {
+                      photoUrl = state.profile.photoUrl;
+                    }
+                    final showPhoto = photoUrl != null && photoUrl.isNotEmpty;
+
+                    return CircleAvatar(
+                      radius: 50,
+                      backgroundColor: AppColors.primary,
+                      backgroundImage:
+                          showPhoto ? NetworkImage(photoUrl) : null,
+                      child: state is ProfileLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : (!showPhoto
+                              ? Text(initials,
+                                  style: const TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white))
+                              : null),
+                    );
+                  }),
                   const SizedBox(height: 14),
                   Text(name,
                       style: const TextStyle(
@@ -82,20 +96,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: Colors.black87)),
                   const SizedBox(height: 4),
                   Text(email,
-                      style: TextStyle(
-                          fontSize: 14, color: Colors.grey.shade500)),
+                      style:
+                          TextStyle(fontSize: 14, color: Colors.grey.shade500)),
                   const SizedBox(height: 32),
                   _buildMenuItem(context,
                       icon: Icons.person_outline,
-                      title: AppStrings.editProfile,
-                      onTap: () async {
-                        await Navigator.pushNamed(
-                            context, AppRoutes.editProfile);
-                        // Refresh profile after returning from edit screen
-                        if (context.mounted) {
-                          context.read<ProfileCubit>().loadProfile();
-                        }
-                      }),
+                      title: AppStrings.editProfile, onTap: () async {
+                    await Navigator.pushNamed(context, AppRoutes.editProfile);
+                    // Refresh profile after returning from edit screen
+                    if (context.mounted) {
+                      context.read<ProfileCubit>().loadProfile();
+                    }
+                  }),
                   _buildMenuItem(context,
                       icon: Icons.calendar_today_outlined,
                       title: AppStrings.myTours,
@@ -144,8 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text(AppStrings.logout),
         content: const Text(AppStrings.logoutQuestion),
         actions: [
@@ -159,8 +170,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Dispatch sign-out via AuthBloc — listener above navigates to splash
               context.read<AuthBloc>().add(const SignOutRequested());
             },
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade600),
+            style:
+                ElevatedButton.styleFrom(backgroundColor: Colors.red.shade600),
             child: const Text(AppStrings.logout),
           ),
         ],
@@ -187,11 +198,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Icon(icon, color: AppColors.primary, size: 22),
         ),
         title: Text(title,
-            style:
-                const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
         trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );

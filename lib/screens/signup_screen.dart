@@ -46,7 +46,8 @@ class _SignupScreenState extends State<SignupScreen> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          UserSession.login(User(name: state.user.name, email: state.user.email));
+          UserSession.login(
+              User(name: state.user.name, email: state.user.email));
           Navigator.pushNamedAndRemoveUntil(
               context, AppRoutes.home, (route) => false);
         } else if (state is AuthSignUpSuccess) {
@@ -260,7 +261,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               const SizedBox(height: 24),
                               Row(children: [
                                 Expanded(
-                                    child: Divider(color: Colors.grey.shade300)),
+                                    child:
+                                        Divider(color: Colors.grey.shade300)),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16),
@@ -270,7 +272,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                           fontSize: 14)),
                                 ),
                                 Expanded(
-                                    child: Divider(color: Colors.grey.shade300)),
+                                    child:
+                                        Divider(color: Colors.grey.shade300)),
                               ]),
                               const SizedBox(height: 20),
                               SizedBox(
@@ -293,8 +296,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 14),
-                                    side: BorderSide(
-                                        color: Colors.grey.shade300),
+                                    side:
+                                        BorderSide(color: Colors.grey.shade300),
                                     shape: RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(12)),

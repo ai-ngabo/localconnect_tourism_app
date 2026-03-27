@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 import '../utils/app_constants.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -11,14 +12,34 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
   bool _locationServicesEnabled = true;
-  String _selectedLanguage = 'English';
+  String _selectedLanguageCode = 'en';
   String _selectedTheme = 'System';
 
   @override
+  void initState() {
+    super.initState();
+    _selectedLanguageCode = AppLocalizations.localeNotifier.value.languageCode;
+    _selectedTheme = _getThemeString(AppLocalizations.themeNotifier.value);
+  }
+
+  String _getThemeString(ThemeMode mode) {
+    switch (mode) {
+      case ThemeMode.light:
+        return 'Light';
+      case ThemeMode.dark:
+        return 'Dark';
+      case ThemeMode.system:
+      default:
+        return 'Light'; // Default to Light instead of System
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final tr = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppStrings.settingsLabel),
+        title: Text(tr.settingsLabel),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -26,9 +47,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Preferences',
-              style: TextStyle(
+            Text(
+              tr.preferences,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
@@ -36,21 +57,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             _buildSwitchSetting(
-              'Push Notifications',
-              'Receive notifications about bookings and updates',
+              tr.pushNotifications,
+              tr.pushNotificationsDesc,
               _notificationsEnabled,
               (value) => setState(() => _notificationsEnabled = value),
             ),
             const SizedBox(height: 12),
             _buildSwitchSetting(
-              'Location Services',
-              'Allow access to location for better recommendations',
+              tr.locationServices,
+              tr.locationServicesDesc,
               _locationServicesEnabled,
               (value) => setState(() => _locationServicesEnabled = value),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Appearance',
+            Text(
+              tr.appearance,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -59,24 +80,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             _buildDropdownSetting(
-              'Language',
-              'Choose your preferred language',
-              _selectedLanguage,
-              ['English', 'French', 'Kinyarwanda'],
-              (value) => setState(() => _selectedLanguage = value!),
+              tr.language,
+              tr.chooseLanguage,
+              _selectedLanguageCode,
+              ['en', 'rw', 'fr'],
+              (value) {
+                if (value == null) return;
+                setState(() {
+                  _selectedLanguageCode = value;
+                });
+                AppLocalizations.localeNotifier.value = Locale(value);
+              },
+              valueBuilder: (langCode) => tr.languageName(langCode),
             ),
             const SizedBox(height: 12),
             _buildDropdownSetting(
-              'Theme',
-              'Choose app theme',
+              tr.theme,
+              tr.chooseTheme,
               _selectedTheme,
-              ['Light', 'Dark', 'System'],
-              (value) => setState(() => _selectedTheme = value!),
+              ['Light', 'Dark'],
+              (value) {
+                if (value == null) return;
+                setState(() => _selectedTheme = value);
+                if (value == 'Light') {
+                  AppLocalizations.themeNotifier.value = ThemeMode.light;
+                } else if (value == 'Dark') {
+                  AppLocalizations.themeNotifier.value = ThemeMode.dark;
+                }
+              },
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Account',
-              style: TextStyle(
+            Text(
+              tr.account,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
@@ -85,17 +121,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 16),
             _buildMenuItem(
               Icons.privacy_tip_outlined,
-              'Privacy Policy',
-              () => _showComingSoonDialog('Privacy Policy'),
+              tr.privacyPolicy,
+              () => _showComingSoonDialog(
+                  tr.privacyPolicy, tr.privacyPolicyContent),
             ),
             _buildMenuItem(
               Icons.description_outlined,
-              'Terms of Service',
-              () => _showComingSoonDialog('Terms of Service'),
+              tr.termsOfService,
+              () => _showComingSoonDialog(
+                  tr.termsOfService, tr.termsServiceContent),
             ),
             _buildMenuItem(
               Icons.info_outline,
-              'About',
+              tr.about,
               () => _showAboutDialog(),
             ),
             const SizedBox(height: 32),
@@ -177,8 +215,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     String subtitle,
     String value,
     List<String> options,
-    ValueChanged<String?> onChanged,
-  ) {
+    ValueChanged<String?> onChanged, {
+    String Function(String)? valueBuilder,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -221,7 +260,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             items: options.map((option) {
               return DropdownMenuItem(
                 value: option,
-                child: Text(option),
+                child:
+                    Text(valueBuilder != null ? valueBuilder(option) : option),
               );
             }).toList(),
             onChanged: onChanged,
@@ -264,19 +304,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showComingSoonDialog(String feature) {
+  void _showComingSoonDialog(String feature, String content) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: Text('$feature'),
-        content: Text('$feature content will be available soon.'),
+        title: Text(feature),
+        content: Text(content),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
+            child: Text(AppLocalizations.of(context).ok),
           ),
         ],
       ),
@@ -284,28 +324,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showAboutDialog() {
+    final tr = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: const Text('About LocalConnect Tourism'),
-        content: const Column(
+        title: Text(tr.aboutTitle),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Version: 1.0.0'),
-            SizedBox(height: 8),
-            Text('LocalConnect Tourism helps you discover amazing tours and connect with local guides in Rwanda.'),
-            SizedBox(height: 8),
-            Text('© 2024 LocalConnect Tourism'),
+            Text(tr.version),
+            const SizedBox(height: 8),
+            Text(tr.aboutDetails),
+            const SizedBox(height: 8),
+            Text(tr.poweredBy),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
+            child: Text(tr.ok),
           ),
         ],
       ),
@@ -313,32 +354,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showResetDialog() {
+    final tr = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: const Text('Reset Settings'),
-        content: const Text(
-          'Are you sure you want to reset all settings to their default values?',
-        ),
+        title: Text(tr.resetSettings),
+        content: Text(tr.resetConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(tr.cancel),
           ),
           ElevatedButton(
             onPressed: () {
               setState(() {
                 _notificationsEnabled = true;
                 _locationServicesEnabled = true;
-                _selectedLanguage = 'English';
+                _selectedLanguageCode = 'rw';
+                AppLocalizations.localeNotifier.value = const Locale('rw');
                 _selectedTheme = 'System';
               });
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Settings reset to defaults')),
+                SnackBar(content: Text(tr.settingsResetConfirmation)),
               );
             },
             style: ElevatedButton.styleFrom(

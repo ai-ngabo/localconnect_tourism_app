@@ -78,6 +78,7 @@ class AppStrings {
   static const duration = 'Duration:';
   static const price = 'Price:';
   static const bookingConfirmed = 'Booking Confirmed!';
+  static const upcomingTourReminder = 'Upcoming Tour Reminder';
   static const selectDate = 'Select Date';
   static const bookYourTour = 'Book Your Tour';
   static const bookNow = 'Book Now';

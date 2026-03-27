@@ -37,8 +37,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _openNotifications() {
     final bookingsState = context.read<BookingsListCubit>().state;
-    final bookings = bookingsState is BookingsListLoaded ? bookingsState.bookings : [];
-    final upcoming = bookingsState is BookingsListLoaded ? bookingsState.upcoming : [];
+    final bookings =
+        bookingsState is BookingsListLoaded ? bookingsState.bookings : [];
+    final upcoming =
+        bookingsState is BookingsListLoaded ? bookingsState.upcoming : [];
     final reminders = upcoming
         .where((b) => b.date.difference(DateTime.now()).inDays <= 7)
         .toList();
@@ -59,19 +61,32 @@ class _HomeScreenState extends State<HomeScreen> {
               Text('You have ${bookings.length} booking(s).',
                   style: const TextStyle(fontSize: 14)),
               const SizedBox(height: 8),
+              if (bookings.isNotEmpty) ...[
+                _notificationCard(
+                  title: AppStrings.bookingConfirmed,
+                  message:
+                      'Your ${bookings.first.tour.title} visit on ${DateFormat('MMM dd, yyyy').format(bookings.first.date)} has been confirmed.',
+                  icon: Icons.check_circle_outline,
+                  backgroundColor: Colors.green.shade50,
+                  iconColor: Colors.green.shade700,
+                ),
+                const SizedBox(height: 10),
+              ],
               if (reminders.isNotEmpty)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Reminders',
+                    const Text(AppStrings.upcomingTourReminder,
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 16)),
-                    const SizedBox(height: 6),
-                    ...reminders.map((booking) => ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.alarm, color: AppColors.primary),
-                          title: Text('${booking.tour.title} on ${DateFormat('MMM dd, yyyy').format(booking.date)}'),
-                          subtitle: Text('In ${booking.date.difference(DateTime.now()).inDays} day(s)'),
+                    const SizedBox(height: 8),
+                    ...reminders.map((booking) => _notificationCard(
+                          title: booking.tour.title,
+                          message:
+                              'Don’t forget your ${booking.tour.title} tomorrow at ${DateFormat('hh:mm a').format(booking.date)}.',
+                          icon: Icons.notifications_active_outlined,
+                          backgroundColor: Colors.orange.shade50,
+                          iconColor: Colors.orange.shade700,
                         )),
                     const SizedBox(height: 10),
                   ],
@@ -79,8 +94,9 @@ class _HomeScreenState extends State<HomeScreen> {
               else
                 const Text('No reminders for the next 7 days.',
                     style: TextStyle(color: Colors.grey)),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               const Divider(),
+              const SizedBox(height: 10),
               if (bookings.isEmpty)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12),
@@ -106,6 +122,40 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _notificationCard({
+    required String title,
+    required String message,
+    required IconData icon,
+    Color backgroundColor = const Color(0xFFF8F8F8),
+    Color iconColor = Colors.blue,
+  }) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.withOpacity(0.25)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: iconColor.withOpacity(0.15),
+          child: Icon(icon, color: iconColor, size: 24),
+        ),
+        title: Text(title,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+        subtitle: Text(message, style: const TextStyle(fontSize: 13)),
+      ),
     );
   }
 
@@ -220,7 +270,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   children: [
                     Builder(builder: (context) {
-                      final bookingState = context.read<BookingsListCubit>().state;
+                      final bookingState =
+                          context.read<BookingsListCubit>().state;
                       final upcomingCount = bookingState is BookingsListLoaded
                           ? bookingState.upcoming.length
                           : 0;
@@ -279,8 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onChanged: (q) => context.read<TourismCubit>().search(q),
               decoration: InputDecoration(
                 hintText: AppStrings.searchToursActivities,
-                hintStyle:
-                    TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
                 prefixIcon:
                     Icon(Icons.search, color: Colors.grey.shade400, size: 22),
                 filled: true,
@@ -305,8 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () =>
                       Navigator.pushNamed(context, AppRoutes.allTours),
                   child: const Text(AppStrings.seeAll,
-                      style:
-                          TextStyle(color: AppColors.primary, fontSize: 13)),
+                      style: TextStyle(color: AppColors.primary, fontSize: 13)),
                 ),
               ],
             ),
@@ -333,8 +382,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () =>
                       Navigator.pushNamed(context, AppRoutes.allGuides),
                   child: const Text(AppStrings.seeAll,
-                      style:
-                          TextStyle(color: AppColors.primary, fontSize: 13)),
+                      style: TextStyle(color: AppColors.primary, fontSize: 13)),
                 ),
               ],
             ),
@@ -359,8 +407,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final tourGradients = AppStyles.tourGradients;
 
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, AppRoutes.tourDetail,
-          arguments: tour),
+      onTap: () =>
+          Navigator.pushNamed(context, AppRoutes.tourDetail, arguments: tour),
       child: Container(
         width: 160,
         margin: const EdgeInsets.only(right: 14),
@@ -488,8 +536,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.black87)),
           const SizedBox(height: 2),
           Text(guide.specialty,
-              style:
-                  TextStyle(fontSize: 11, color: Colors.grey.shade500),
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
               textAlign: TextAlign.center),
         ],
       ),
@@ -558,8 +605,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: TextStyle(
                 fontSize: 12,
                 color: selected ? AppColors.primary : Colors.grey.shade600,
-                fontWeight:
-                    selected ? FontWeight.w600 : FontWeight.normal)),
+                fontWeight: selected ? FontWeight.w600 : FontWeight.normal)),
       ],
     );
   }
@@ -568,8 +614,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final tourIcons = AppStyles.tourIcons;
     final tourGradients = AppStyles.tourGradients;
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, AppRoutes.tourDetail,
-          arguments: tour),
+      onTap: () =>
+          Navigator.pushNamed(context, AppRoutes.tourDetail, arguments: tour),
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
         padding: const EdgeInsets.all(12),
@@ -591,7 +637,8 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 70,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                    colors: tourGradients[tour.id] ?? [AppColors.primaryLight, AppColors.primary]),
+                    colors: tourGradients[tour.id] ??
+                        [AppColors.primaryLight, AppColors.primary]),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: AppStyles.tourImages[tour.id] != null
@@ -617,8 +664,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontWeight: FontWeight.w600, fontSize: 15)),
                   const SizedBox(height: 4),
                   Text('${tour.duration} · ${tour.category}',
-                      style: TextStyle(
-                          color: Colors.grey.shade600, fontSize: 13)),
+                      style:
+                          TextStyle(color: Colors.grey.shade600, fontSize: 13)),
                   const SizedBox(height: 4),
                   Row(
                     children: [

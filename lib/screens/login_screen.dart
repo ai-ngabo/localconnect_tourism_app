@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../localization/app_localizations.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/bloc/auth_event.dart';
 import '../features/auth/presentation/bloc/auth_state.dart';
@@ -37,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalizations.of(context);
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
@@ -104,16 +106,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const Text(
-                                AppStrings.logInTitle,
-                                style: TextStyle(
+                              Text(
+                                tr.logInTitle,
+                                style: const TextStyle(
                                     fontSize: 26,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black87),
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                AppStrings.accessAccount,
+                                tr.accessAccount,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize: 14,
@@ -126,16 +128,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
-                                  hintText: AppStrings.email,
+                                  hintText: tr.email,
                                   prefixIcon: Icon(Icons.email_outlined,
                                       color: Colors.grey.shade500),
                                 ),
                                 validator: (v) {
                                   if (v == null || v.isEmpty) {
-                                    return AppStrings.enterYourEmail;
+                                    return tr.enterYourEmail;
                                   }
                                   if (!v.contains('@')) {
-                                    return AppStrings.enterValidEmail;
+                                    return tr.enterValidEmail;
                                   }
                                   return null;
                                 },
@@ -148,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   controller: _passwordController,
                                   obscureText: _obscurePassword,
                                   decoration: InputDecoration(
-                                    hintText: AppStrings.password,
+                                    hintText: tr.password,
                                     prefixIcon: Icon(Icons.lock_outline,
                                         color: Colors.grey.shade500),
                                     suffixIcon: IconButton(
@@ -164,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   validator: (v) {
                                     if (v == null || v.isEmpty) {
-                                      return AppStrings.enterPassword;
+                                      return tr.enterPassword;
                                     }
                                     return null;
                                   },
@@ -183,8 +185,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     );
                                   },
-                                  child: const Text(
-                                    AppStrings.forgotPassword,
+                                  child: Text(
+                                    tr.forgotPassword,
                                     style: TextStyle(
                                         color: AppColors.primary,
                                         fontWeight: FontWeight.w500,
@@ -214,7 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                         Colors.white),
                                               ),
                                             )
-                                          : const Text(AppStrings.logInTitle),
+                                          : Text(tr.logInTitle),
                                     ),
                                   );
                                 },
@@ -223,14 +225,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(AppStrings.dontHaveAccount,
+                                  Text(tr.dontHaveAccount,
                                       style: TextStyle(
                                           color: Colors.grey.shade600,
                                           fontSize: 14)),
                                   GestureDetector(
                                     onTap: () => Navigator.pushReplacementNamed(
                                         context, AppRoutes.signup),
-                                    child: const Text(AppStrings.signUp,
+                                    child: Text(tr.signUp,
                                         style: TextStyle(
                                             color: AppColors.primary,
                                             fontWeight: FontWeight.w600,
@@ -241,17 +243,19 @@ class _LoginScreenState extends State<LoginScreen> {
                               const SizedBox(height: 28),
                               Row(children: [
                                 Expanded(
-                                    child: Divider(color: Colors.grey.shade300)),
+                                    child:
+                                        Divider(color: Colors.grey.shade300)),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16),
-                                  child: Text(AppStrings.or,
+                                  child: Text(tr.or,
                                       style: TextStyle(
                                           color: Colors.grey.shade500,
                                           fontSize: 14)),
                                 ),
                                 Expanded(
-                                    child: Divider(color: Colors.grey.shade300)),
+                                    child:
+                                        Divider(color: Colors.grey.shade300)),
                               ]),
                               const SizedBox(height: 20),
                               SizedBox(
@@ -262,20 +266,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                         .read<AuthBloc>()
                                         .add(const GoogleSignInRequested());
                                   },
-                                  icon: const Text(AppStrings.googleLetter,
-                                      style: TextStyle(
+                                  icon: Text(tr.googleLetter,
+                                      style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.red)),
-                                  label: const Text(AppStrings.googleContinue,
-                                      style: TextStyle(
+                                  label: Text(tr.googleContinue,
+                                      style: const TextStyle(
                                           color: Colors.black87,
                                           fontWeight: FontWeight.w500)),
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 14),
-                                    side: BorderSide(
-                                        color: Colors.grey.shade300),
+                                    side:
+                                        BorderSide(color: Colors.grey.shade300),
                                     shape: RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(12)),

@@ -6,7 +6,8 @@ import '../../domain/entities/user_entity.dart';
 
 abstract class AuthRemoteDataSource {
   Future<UserEntity> signIn({required String email, required String password});
-  Future<void> signUp({required String name, required String email, required String password});
+  Future<void> signUp(
+      {required String name, required String email, required String password});
   Future<void> signOut();
   Future<UserEntity> signInWithGoogle();
 }
@@ -21,7 +22,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   });
 
   @override
-  Future<UserEntity> signIn({required String email, required String password}) async {
+  Future<UserEntity> signIn(
+      {required String email, required String password}) async {
     final credential = await firebaseAuth.signInWithEmailAndPassword(
       email: email,
       password: password,
@@ -56,11 +58,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       uid: fbUser.uid,
       name: name.isNotEmpty ? name : (fbUser.email ?? 'User'),
       email: fbUser.email ?? email,
+      photoUrl: fbUser.photoURL,
     );
   }
 
   @override
-  Future<void> signUp({required String name, required String email, required String password}) async {
+  Future<void> signUp(
+      {required String name,
+      required String email,
+      required String password}) async {
     final credential = await firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
@@ -107,8 +113,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       idToken: googleAuth.idToken,
     );
 
-    final userCredential =
-        await firebaseAuth.signInWithCredential(credential);
+    final userCredential = await firebaseAuth.signInWithCredential(credential);
     final fbUser = userCredential.user;
     if (fbUser == null) throw Exception('Authentication failed');
 
@@ -120,8 +125,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
     return UserEntity(
       uid: fbUser.uid,
-      name: fbUser.displayName ?? googleUser.displayName ?? fbUser.email ?? 'User',
+      name: fbUser.displayName ??
+          googleUser.displayName ??
+          fbUser.email ??
+          'User',
       email: fbUser.email ?? '',
+      photoUrl: fbUser.photoURL ?? googleUser.photoUrl,
     );
   }
 }

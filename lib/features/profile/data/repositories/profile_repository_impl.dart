@@ -35,6 +35,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
       uid: fbUser.uid,
       name: name.isNotEmpty ? name : (fbUser.email ?? 'User'),
       email: fbUser.email ?? '',
+      photoUrl: fbUser.photoURL,
     );
   }
 
