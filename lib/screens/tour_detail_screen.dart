@@ -40,30 +40,33 @@ class _TourDetailScreenState extends State<TourDetailScreen> {
           // Hero image area
           Stack(
             children: [
-              Container(
-                height: 280,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: tourGradients[tour.id] ??
-                        [AppColors.primaryLight, AppColors.primary],
+              Hero(
+                tag: 'tour_image_${tour.id}',
+                child: Container(
+                  height: 280,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: tourGradients[tour.id] ??
+                          [AppColors.primaryLight, AppColors.primary],
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: AppStyles.tourImages[tour.id] != null
-                      ? Image.asset(
-                          AppStyles.tourImages[tour.id]!,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                        )
-                      : Icon(
-                          AppStyles.tourIcons[tour.id] ?? Icons.tour,
-                          size: 80,
-                          color: AppColors.white.withValues(alpha: 0.5),
-                        ),
+                  child: Center(
+                    child: AppStyles.tourImages[tour.id] != null
+                        ? Image.asset(
+                            AppStyles.tourImages[tour.id]!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                          )
+                        : Icon(
+                            AppStyles.tourIcons[tour.id] ?? Icons.tour,
+                            size: 80,
+                            color: AppColors.white.withValues(alpha: 0.5),
+                          ),
+                  ),
                 ),
               ),
               // Back button
@@ -167,7 +170,7 @@ class _TourDetailScreenState extends State<TourDetailScreen> {
                           ' (128 reviews)',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey.shade500,
+                            color: Colors.grey.shade600,
                           ),
                         ),
                       ],

@@ -128,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 decoration: InputDecoration(
                                   hintText: AppStrings.email,
                                   prefixIcon: Icon(Icons.email_outlined,
-                                      color: Colors.grey.shade500),
+                                      color: Colors.grey.shade600),
                                 ),
                                 validator: (v) {
                                   if (v == null || v.isEmpty) {
@@ -150,13 +150,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                   decoration: InputDecoration(
                                     hintText: AppStrings.password,
                                     prefixIcon: Icon(Icons.lock_outline,
-                                        color: Colors.grey.shade500),
+                                        color: Colors.grey.shade600),
                                     suffixIcon: IconButton(
                                       icon: Icon(
                                         _obscurePassword
                                             ? Icons.visibility_off_outlined
                                             : Icons.visibility_outlined,
-                                        color: Colors.grey.shade500,
+                                        color: Colors.grey.shade600,
                                       ),
                                       onPressed: () => setLocal(() =>
                                           _obscurePassword = !_obscurePassword),
@@ -247,7 +247,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       horizontal: 16),
                                   child: Text(AppStrings.or,
                                       style: TextStyle(
-                                          color: Colors.grey.shade500,
+                                          color: Colors.grey.shade600,
                                           fontSize: 14)),
                                 ),
                                 Expanded(

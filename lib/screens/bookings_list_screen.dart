@@ -250,7 +250,7 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                       child: Row(
                         children: [
                           Icon(Icons.calendar_today,
-                              size: 20, color: Colors.grey.shade500),
+                              size: 20, color: Colors.grey.shade600),
                           const SizedBox(width: 12),
                           Text(
                             DateFormat('EEE, MMM dd, yyyy')
@@ -259,7 +259,7 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                           ),
                           const Spacer(),
                           Icon(Icons.arrow_drop_down,
-                              color: Colors.grey.shade500),
+                              color: Colors.grey.shade600),
                         ],
                       ),
                     ),
@@ -282,7 +282,7 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                     child: Row(
                       children: [
                         Icon(Icons.people_outline,
-                            size: 20, color: Colors.grey.shade500),
+                            size: 20, color: Colors.grey.shade600),
                         const SizedBox(width: 12),
                         Text('$guestCount',
                             style: const TextStyle(fontSize: 16)),
@@ -391,10 +391,10 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
       ),
       child: Column(
         children: [
-          Icon(Icons.calendar_today, size: 36, color: Colors.grey.shade400),
+          Icon(Icons.calendar_today, size: 36, color: Colors.grey.shade600),
           const SizedBox(height: 10),
           Text(message,
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 14)),
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
         ],
       ),
     );
@@ -473,7 +473,7 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                   Row(
                     children: [
                       Icon(Icons.calendar_today,
-                          size: 14, color: Colors.grey.shade500),
+                          size: 14, color: Colors.grey.shade600),
                       const SizedBox(width: 6),
                       Text(
                         '${AppStrings.date} ${DateFormat('EEE, MMM dd, yyyy').format(booking.date)}',
@@ -487,7 +487,7 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                   Row(
                     children: [
                       Icon(Icons.people_outline,
-                          size: 14, color: Colors.grey.shade500),
+                          size: 14, color: Colors.grey.shade600),
                       const SizedBox(width: 6),
                       Text(
                         '${booking.guests} guest(s)  •  ${AppFormat.price(booking.totalCost)}',

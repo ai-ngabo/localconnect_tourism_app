@@ -316,7 +316,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Text(label,
                         style: TextStyle(
-                            fontSize: 12, color: Colors.grey.shade500)),
+                            fontSize: 12, color: Colors.grey.shade600)),
                     const SizedBox(height: 2),
                     Text(value,
                         style: const TextStyle(
@@ -368,7 +368,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           fontSize: 15, fontWeight: FontWeight.w500)),
                 ),
                 Icon(Icons.chevron_right,
-                    color: Colors.grey.shade400, size: 22),
+                    color: Colors.grey.shade600, size: 22),
               ],
             ),
           ),

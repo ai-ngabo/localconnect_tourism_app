@@ -385,12 +385,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         validator: validator,
         style: TextStyle(
           fontSize: 15,
-          color: readOnly ? Colors.grey.shade500 : Colors.black87,
+          color: readOnly ? Colors.grey.shade600 : Colors.black87,
         ),
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+          hintStyle: TextStyle(color: Colors.grey.shade600, fontSize: 14),
           prefixIcon: Icon(icon, color: AppColors.primary, size: 22),
           suffixIcon: suffixIcon,
           border: OutlineInputBorder(

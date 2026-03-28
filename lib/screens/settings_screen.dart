@@ -12,15 +12,12 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true;
-  bool _locationServicesEnabled = true;
-
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    final subtitleColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
+    final subtitleColor = isDark ? Colors.grey.shade600 : Colors.grey.shade600;
 
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, settings) {
@@ -41,8 +38,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _buildSwitchSetting(
                   l10n.pushNotifications,
                   l10n.pushNotificationsSubtitle,
-                  _notificationsEnabled,
-                  (value) => setState(() => _notificationsEnabled = value),
+                  settings.notificationsEnabled,
+                  (value) => cubit.setNotificationsEnabled(value),
                   cardColor: cardColor,
                   subtitleColor: subtitleColor,
                 ),
@@ -50,8 +47,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _buildSwitchSetting(
                   l10n.locationServices,
                   l10n.locationServicesSubtitle,
-                  _locationServicesEnabled,
-                  (value) => setState(() => _locationServicesEnabled = value),
+                  settings.locationServicesEnabled,
+                  (value) => cubit.setLocationServicesEnabled(value),
                   cardColor: cardColor,
                   subtitleColor: subtitleColor,
                 ),
@@ -277,7 +274,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         trailing: Icon(
           Icons.chevron_right,
-          color: Colors.grey.shade400,
+          color: Colors.grey.shade600,
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -350,10 +347,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ElevatedButton(
             onPressed: () {
               context.read<SettingsCubit>().resetSettings();
-              setState(() {
-                _notificationsEnabled = true;
-                _locationServicesEnabled = true;
-              });
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(l10n.settingsReset)),

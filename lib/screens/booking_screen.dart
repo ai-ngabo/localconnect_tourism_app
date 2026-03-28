@@ -253,7 +253,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       child: Row(
                         children: [
                           Icon(Icons.calendar_today,
-                              size: 20, color: Colors.grey.shade500),
+                              size: 20, color: Colors.grey.shade600),
                           const SizedBox(width: 12),
                           Text(
                             formState.selectedDate != null
@@ -264,12 +264,12 @@ class _BookingScreenState extends State<BookingScreen> {
                               fontSize: 15,
                               color: formState.selectedDate != null
                                   ? Colors.black87
-                                  : Colors.grey.shade400,
+                                  : Colors.grey.shade600,
                             ),
                           ),
                           const Spacer(),
                           Icon(Icons.arrow_drop_down,
-                              color: Colors.grey.shade500),
+                              color: Colors.grey.shade600),
                         ],
                       ),
                     ),
@@ -293,7 +293,7 @@ class _BookingScreenState extends State<BookingScreen> {
                     child: Row(
                       children: [
                         Icon(Icons.people_outline,
-                            size: 20, color: Colors.grey.shade500),
+                            size: 20, color: Colors.grey.shade600),
                         const SizedBox(width: 12),
                         Text('${formState.guests}',
                             style: const TextStyle(fontSize: 16)),
@@ -365,7 +365,7 @@ class _BookingScreenState extends State<BookingScreen> {
                     decoration: InputDecoration(
                       hintText: 'Any special requests or notes...',
                       hintStyle:
-                          TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                          TextStyle(color: Colors.grey.shade600, fontSize: 14),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey.shade300),

@@ -196,7 +196,7 @@ class SupportScreen extends StatelessWidget {
         ),
         trailing: Icon(
           Icons.chevron_right,
-          color: Colors.grey.shade400,
+          color: Colors.grey.shade600,
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         shape: RoundedRectangleBorder(

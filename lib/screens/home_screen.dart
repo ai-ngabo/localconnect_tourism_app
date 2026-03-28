@@ -258,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         'No notifications yet.\nBook a tour or guide to get started!',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                            color: Colors.grey.shade500,
+                                            color: Colors.grey.shade600,
                                             fontSize: 14),
                                       ),
                                     ],
@@ -356,11 +356,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 2),
                   Text(
                     DateFormat('EEE, MMM dd, yyyy').format(item.date),
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                   ),
                   Text(item.detail,
                       style: TextStyle(
-                          fontSize: 11, color: Colors.grey.shade400)),
+                          fontSize: 11, color: Colors.grey.shade600)),
                 ],
               ),
             ),
@@ -464,9 +464,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHomeContent(TourismLoaded state) {
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
@@ -554,9 +557,9 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: InputDecoration(
                 hintText: AppStrings.searchToursActivities,
                 hintStyle:
-                    TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                    TextStyle(color: Colors.grey.shade600, fontSize: 14),
                 prefixIcon:
-                    Icon(Icons.search, color: Colors.grey.shade400, size: 22),
+                    Icon(Icons.search, color: Colors.grey.shade600, size: 22),
                 filled: true,
                 fillColor: Colors.grey.shade100,
                 border: OutlineInputBorder(
@@ -599,6 +602,8 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 20),
           ],
         ),
+      ),
+    ),
       ),
     );
   }
@@ -696,7 +701,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontSize: 18, fontWeight: FontWeight.bold)),
                         Text(guide.specialty,
                             style: TextStyle(
-                                color: Colors.grey.shade500, fontSize: 13)),
+                                color: Colors.grey.shade600, fontSize: 13)),
                       ],
                     ),
                   ),
@@ -748,7 +753,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Icon(Icons.calendar_today,
                           size: 18,
                           color: selectedDate != null
-                              ? AppColors.primary : Colors.grey.shade400),
+                              ? AppColors.primary : Colors.grey.shade600),
                       const SizedBox(width: 10),
                       Text(
                         selectedDate != null
@@ -757,7 +762,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           color: selectedDate != null
-                              ? Colors.black87 : Colors.grey.shade400,
+                              ? Colors.black87 : Colors.grey.shade600,
                         ),
                       ),
                     ],
@@ -867,29 +872,32 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                height: 120,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: tourGradients[tour.id] ??
-                        [AppColors.primaryLight, AppColors.primary],
+              Hero(
+                tag: 'tour_image_${tour.id}',
+                child: Container(
+                  height: 120,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: tourGradients[tour.id] ??
+                          [AppColors.primaryLight, AppColors.primary],
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: AppStyles.tourImages[tour.id] != null
-                      ? Image.asset(
-                          AppStyles.tourImages[tour.id]!,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                        )
-                      : Icon(
-                          AppStyles.tourIcons[tour.id] ?? Icons.tour,
-                          size: 44,
-                          color: AppColors.white.withValues(alpha: 0.8),
-                        ),
+                  child: Center(
+                    child: AppStyles.tourImages[tour.id] != null
+                        ? Image.asset(
+                            AppStyles.tourImages[tour.id]!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                          )
+                        : Icon(
+                            AppStyles.tourIcons[tour.id] ?? Icons.tour,
+                            size: 44,
+                            color: AppColors.white.withValues(alpha: 0.8),
+                          ),
+                  ),
                 ),
               ),
               Container(
@@ -978,7 +986,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6),
               child: Text(guide.specialty,
-                  style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis),
@@ -1008,10 +1016,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(AppStrings.explore,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(AppStrings.explore,
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
           TextField(
@@ -1063,7 +1074,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 12),
                     Text(
                       'No tours found in this category',
-                      style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                     ),
                   ],
                 ),
@@ -1071,7 +1082,9 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           else
             ...state.filteredTours.map(_buildExploreTourItem),
-        ],
+          ],
+        ),
+      ),
       ),
     );
   }
@@ -1129,26 +1142,29 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Row(
           children: [
-            Container(
-              width: 70,
-              height: 70,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: tourGradients[tour.id] ?? [AppColors.primaryLight, AppColors.primary]),
-                borderRadius: BorderRadius.circular(12),
+            Hero(
+              tag: 'tour_image_${tour.id}',
+              child: Container(
+                width: 70,
+                height: 70,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: tourGradients[tour.id] ?? [AppColors.primaryLight, AppColors.primary]),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: AppStyles.tourImages[tour.id] != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          AppStyles.tourImages[tour.id]!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      )
+                    : Icon(tourIcons[tour.id] ?? Icons.tour,
+                        color: AppColors.white.withValues(alpha: 0.8), size: 30),
               ),
-              child: AppStyles.tourImages[tour.id] != null
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(
-                        AppStyles.tourImages[tour.id]!,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
-                    )
-                  : Icon(tourIcons[tour.id] ?? Icons.tour,
-                      color: AppColors.white.withValues(alpha: 0.8), size: 30),
             ),
             const SizedBox(width: 14),
             Expanded(
