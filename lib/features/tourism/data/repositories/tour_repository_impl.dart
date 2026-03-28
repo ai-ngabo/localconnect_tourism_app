@@ -50,6 +50,17 @@ class TourRepositoryImpl implements TourRepository {
       rating: 4.7,
       category: 'Nature',
     ),
+    TourEntity(
+      id: '5',
+      title: 'The Pinnacle Boutique Hotel',
+      description:
+          'Savor world-class cuisine at The Pinnacle Boutique Hotel in Kigali.\n\nIndulge in a curated dining experience featuring the finest Rwandan and international dishes, crafted by top chefs using locally sourced ingredients. Enjoy elegant ambiance, rooftop views of Kigali, and signature cocktails.',
+      imageUrl: 'pinnacles',
+      duration: '3 Hours',
+      priceRwf: 120,
+      rating: 4.9,
+      category: 'Food',
+    ),
   ];
 
   static const List<GuideEntity> _guides = [

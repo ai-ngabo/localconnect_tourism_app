@@ -76,7 +76,7 @@ class _BookingScreenState extends State<BookingScreen> {
             Text('${AppStrings.guests} ${formState.guests}'),
             const SizedBox(height: 6),
             Text(
-              '${AppStrings.total} ${totalCost}00 Rwf',
+              '${AppStrings.total} ${AppFormat.price(totalCost)}',
               style: const TextStyle(
                   fontWeight: FontWeight.bold, color: AppColors.primary),
             ),
@@ -224,7 +224,7 @@ class _BookingScreenState extends State<BookingScreen> {
                                     fontSize: 18, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 4),
                             Text(
-                                '${tour.duration} · ${tour.priceRwf} Rwf/person',
+                                '${tour.duration} · ${AppFormat.price(tour.priceRwf)}/person',
                                 style: TextStyle(
                                     color: Colors.grey.shade600, fontSize: 13)),
                           ],
@@ -344,7 +344,7 @@ class _BookingScreenState extends State<BookingScreen> {
                         const Text(AppStrings.totalCost,
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w600)),
-                        Text('${totalCost}00 Rwf',
+                        Text(AppFormat.price(totalCost),
                             style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,

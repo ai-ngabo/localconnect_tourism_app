@@ -217,7 +217,7 @@ class _TourDetailScreenState extends State<TourDetailScreen> {
                             size: 20, color: AppColors.primary),
                         const SizedBox(width: 8),
                         Text(
-                          '${AppStrings.price} ${tour.priceRwf} Rwf',
+                          '${AppStrings.price} ${AppFormat.price(tour.priceRwf)}',
                           style: const TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 15,

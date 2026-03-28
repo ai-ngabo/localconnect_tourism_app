@@ -131,7 +131,7 @@ class SupportScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -233,7 +233,7 @@ class SupportScreen extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: Text('$feature'),
+        title: Text(feature),
         content: Text('$feature will be available soon.'),
         actions: [
           TextButton(

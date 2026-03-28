@@ -119,7 +119,7 @@ class _AllToursScreenState extends State<AllToursScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${tour.priceRwf} Rwf',
+                              AppFormat.price(tour.priceRwf),
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,

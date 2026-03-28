@@ -28,10 +28,16 @@ class BookingsListLoaded extends BookingsListState {
   const BookingsListLoaded(this.bookings);
 
   List<BookingEntity> get upcoming =>
-      bookings.where((b) => b.status == 'Confirmed').toList();
+      bookings.where((b) => b.status == 'Confirmed').toList()
+        ..sort((a, b) => b.date.compareTo(a.date));
 
   List<BookingEntity> get past =>
-      bookings.where((b) => b.status == 'Completed').toList();
+      bookings.where((b) => b.status == 'Completed').toList()
+        ..sort((a, b) => b.date.compareTo(a.date));
+
+  List<BookingEntity> get cancelled =>
+      bookings.where((b) => b.status == 'Cancelled').toList()
+        ..sort((a, b) => b.date.compareTo(a.date));
 
   @override
   List<Object?> get props => [bookings];
@@ -51,6 +57,8 @@ class BookingsListCubit extends Cubit<BookingsListState> {
   final GetBookingsUseCase getBookingsUseCase;
   final UpdatePastBookingsUseCase updatePastBookingsUseCase;
   final CancelBookingUseCase cancelBookingUseCase;
+  final DeleteBookingUseCase deleteBookingUseCase;
+  final UpdateBookingUseCase updateBookingUseCase;
 
   StreamSubscription<List<BookingEntity>>? _subscription;
 
@@ -58,6 +66,8 @@ class BookingsListCubit extends Cubit<BookingsListState> {
     required this.getBookingsUseCase,
     required this.updatePastBookingsUseCase,
     required this.cancelBookingUseCase,
+    required this.deleteBookingUseCase,
+    required this.updateBookingUseCase,
   }) : super(const BookingsListInitial());
 
   Future<void> watchBookings(String userEmail) async {
@@ -76,9 +86,36 @@ class BookingsListCubit extends Cubit<BookingsListState> {
   Future<void> cancelBooking(String bookingId) async {
     try {
       await cancelBookingUseCase(bookingId);
-      // Stream subscription will automatically refresh the list after deletion
     } catch (e) {
       emit(BookingsListError('Could not cancel booking. Please try again.'));
+    }
+  }
+
+  /// Permanently deletes a booking document from Firestore.
+  Future<void> deleteBooking(String bookingId) async {
+    try {
+      await deleteBookingUseCase(bookingId);
+    } catch (e) {
+      emit(const BookingsListError('Could not delete booking. Please try again.'));
+    }
+  }
+
+  /// Updates date and/or guests for an existing booking.
+  Future<void> updateBooking({
+    required String bookingId,
+    DateTime? date,
+    int? guests,
+    int? totalCost,
+  }) async {
+    try {
+      await updateBookingUseCase(
+        bookingId: bookingId,
+        date: date,
+        guests: guests,
+        totalCost: totalCost,
+      );
+    } catch (e) {
+      emit(BookingsListError('Could not update booking. Please try again.'));
     }
   }
 
