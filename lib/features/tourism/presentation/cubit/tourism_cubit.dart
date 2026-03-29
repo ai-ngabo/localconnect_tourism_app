@@ -37,4 +37,15 @@ class TourismCubit extends Cubit<TourismState> {
       emit(current.copyWith(searchQuery: ''));
     }
   }
+
+  void filterByCategory(String? category) {
+    final current = state;
+    if (current is TourismLoaded) {
+      // null = All; otherwise toggle (tap same category to clear)
+      final newCategory = category == null
+          ? null
+          : current.selectedCategory == category ? null : category;
+      emit(current.copyWith(selectedCategory: () => newCategory));
+    }
+  }
 }

@@ -46,11 +46,11 @@ class _LoginScreenState extends State<LoginScreen> {
           UserSession.login(
             User(name: state.user.name, email: state.user.email),
           );
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            AppRoutes.home,
-            (route) => false,
-          );
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('You have logged in successfully'),
+            backgroundColor: Colors.green,
+          ));
+          Navigator.pushReplacementNamed(context, '/home');
         } else if (state is AuthEmailNotVerified) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(state.message),
-            backgroundColor: AppColors.primary,
+            backgroundColor: Colors.red,
           ));
         }
       },
@@ -130,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 decoration: InputDecoration(
                                   hintText: tr.email,
                                   prefixIcon: Icon(Icons.email_outlined,
-                                      color: Colors.grey.shade500),
+                                      color: Colors.grey.shade600),
                                 ),
                                 validator: (v) {
                                   if (v == null || v.isEmpty) {
@@ -152,13 +152,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                   decoration: InputDecoration(
                                     hintText: tr.password,
                                     prefixIcon: Icon(Icons.lock_outline,
-                                        color: Colors.grey.shade500),
+                                        color: Colors.grey.shade600),
                                     suffixIcon: IconButton(
                                       icon: Icon(
                                         _obscurePassword
                                             ? Icons.visibility_off_outlined
                                             : Icons.visibility_outlined,
-                                        color: Colors.grey.shade500,
+                                        color: Colors.grey.shade600,
                                       ),
                                       onPressed: () => setLocal(() =>
                                           _obscurePassword = !_obscurePassword),
@@ -250,7 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       horizontal: 16),
                                   child: Text(tr.or,
                                       style: TextStyle(
-                                          color: Colors.grey.shade500,
+                                          color: Colors.grey.shade600,
                                           fontSize: 14)),
                                 ),
                                 Expanded(

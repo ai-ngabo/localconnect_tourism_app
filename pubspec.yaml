@@ -24,6 +24,11 @@ dependencies:
   dartz: ^0.10.1
   google_sign_in: ^6.2.1
   url_launcher: ^6.2.2
+  shared_preferences: ^2.3.0
+  image_picker: ^1.0.7
+  firebase_storage: ^13.2.0
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:

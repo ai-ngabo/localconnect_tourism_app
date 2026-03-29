@@ -134,6 +134,24 @@ class AppStrings {
   static const food = 'Food';
 }
 
+class AppFormat {
+  AppFormat._();
+
+  /// Format a price value for display.
+  /// Stored prices are in thousands (e.g. 50 = 50,000 Rwf).
+  static String price(int value) {
+    final full = value * 1000;
+    // Add thousand separators
+    final str = full.toString();
+    final buffer = StringBuffer();
+    for (int i = 0; i < str.length; i++) {
+      if (i > 0 && (str.length - i) % 3 == 0) buffer.write(',');
+      buffer.write(str[i]);
+    }
+    return '${buffer.toString()} Rwf';
+  }
+}
+
 class AppRoutes {
   AppRoutes._();
 
@@ -163,6 +181,7 @@ class AppStyles {
     '2': [AppColors.primaryLight2, AppColors.primaryDark],
     '3': [AppColors.primaryLight3, AppColors.primaryDark],
     '4': [AppColors.primaryAccent, AppColors.secondaryDark],
+    '5': [const Color(0xFFFF8A65), const Color(0xFFD84315)],
   };
 
   static Map<String, IconData> tourIcons = {
@@ -170,6 +189,7 @@ class AppStyles {
     '2': Icons.eco,
     '3': Icons.terrain,
     '4': Icons.sailing,
+    '5': Icons.restaurant_menu,
   };
 
   // New image-based replacements for tour/guide icons
@@ -178,6 +198,7 @@ class AppStyles {
     '2': 'assets/images/gitega.jpg',
     '3': 'assets/images/Lake_Kivu.jpeg',
     '4': 'assets/images/canopy.jpeg',
+    '5': 'assets/images/pinnacles.jpg',
   };
 
   static Map<String, String> guideImages = {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../localization/app_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../core/l10n/app_localizations.dart';
+import '../features/settings/presentation/cubit/settings_cubit.dart';
 import '../utils/app_constants.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -10,149 +12,129 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true;
-  bool _locationServicesEnabled = true;
-  String _selectedLanguageCode = 'en';
-  String _selectedTheme = 'System';
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedLanguageCode = AppLocalizations.localeNotifier.value.languageCode;
-    _selectedTheme = _getThemeString(AppLocalizations.themeNotifier.value);
-  }
-
-  String _getThemeString(ThemeMode mode) {
-    switch (mode) {
-      case ThemeMode.light:
-        return 'Light';
-      case ThemeMode.dark:
-        return 'Dark';
-      case ThemeMode.system:
-      default:
-        return 'Light'; // Default to Light instead of System
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final tr = AppLocalizations.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(tr.settingsLabel),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              tr.preferences,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildSwitchSetting(
-              tr.pushNotifications,
-              tr.pushNotificationsDesc,
-              _notificationsEnabled,
-              (value) => setState(() => _notificationsEnabled = value),
-            ),
-            const SizedBox(height: 12),
-            _buildSwitchSetting(
-              tr.locationServices,
-              tr.locationServicesDesc,
-              _locationServicesEnabled,
-              (value) => setState(() => _locationServicesEnabled = value),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              tr.appearance,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildDropdownSetting(
-              tr.language,
-              tr.chooseLanguage,
-              _selectedLanguageCode,
-              ['en', 'rw', 'fr'],
-              (value) {
-                if (value == null) return;
-                setState(() {
-                  _selectedLanguageCode = value;
-                });
-                AppLocalizations.localeNotifier.value = Locale(value);
-              },
-              valueBuilder: (langCode) => tr.languageName(langCode),
-            ),
-            const SizedBox(height: 12),
-            _buildDropdownSetting(
-              tr.theme,
-              tr.chooseTheme,
-              _selectedTheme,
-              ['Light', 'Dark'],
-              (value) {
-                if (value == null) return;
-                setState(() => _selectedTheme = value);
-                if (value == 'Light') {
-                  AppLocalizations.themeNotifier.value = ThemeMode.light;
-                } else if (value == 'Dark') {
-                  AppLocalizations.themeNotifier.value = ThemeMode.dark;
-                }
-              },
-            ),
-            const SizedBox(height: 24),
-            Text(
-              tr.account,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildMenuItem(
-              Icons.privacy_tip_outlined,
-              tr.privacyPolicy,
-              () => _showComingSoonDialog(
-                  tr.privacyPolicy, tr.privacyPolicyContent),
-            ),
-            _buildMenuItem(
-              Icons.description_outlined,
-              tr.termsOfService,
-              () => _showComingSoonDialog(
-                  tr.termsOfService, tr.termsServiceContent),
-            ),
-            _buildMenuItem(
-              Icons.info_outline,
-              tr.about,
-              () => _showAboutDialog(),
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () => _showResetDialog(),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: Colors.red),
+    final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final subtitleColor = isDark ? Colors.grey.shade600 : Colors.grey.shade600;
+
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, settings) {
+        final cubit = context.read<SettingsCubit>();
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(l10n.settings),
+            centerTitle: true,
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _sectionTitle(l10n.preferences),
+                const SizedBox(height: 16),
+                _buildSwitchSetting(
+                  l10n.pushNotifications,
+                  l10n.pushNotificationsSubtitle,
+                  settings.notificationsEnabled,
+                  (value) => cubit.setNotificationsEnabled(value),
+                  cardColor: cardColor,
+                  subtitleColor: subtitleColor,
                 ),
-                child: const Text(
-                  'Reset All Settings',
-                  style: TextStyle(color: Colors.red),
+                const SizedBox(height: 12),
+                _buildSwitchSetting(
+                  l10n.locationServices,
+                  l10n.locationServicesSubtitle,
+                  settings.locationServicesEnabled,
+                  (value) => cubit.setLocationServicesEnabled(value),
+                  cardColor: cardColor,
+                  subtitleColor: subtitleColor,
                 ),
-              ),
+                const SizedBox(height: 24),
+                _sectionTitle(l10n.appearance),
+                const SizedBox(height: 16),
+                _buildDropdownSetting(
+                  l10n.language,
+                  l10n.chooseLanguage,
+                  cubit.localeLabel,
+                  SettingsCubit.locales.keys.toList(),
+                  (value) {
+                    if (value != null) {
+                      cubit.setLocale(SettingsCubit.locales[value]!);
+                    }
+                  },
+                  cardColor: cardColor,
+                  subtitleColor: subtitleColor,
+                ),
+                const SizedBox(height: 12),
+                _buildDropdownSetting(
+                  l10n.theme,
+                  l10n.chooseTheme,
+                  cubit.themeLabel,
+                  SettingsCubit.themeModes.keys.toList(),
+                  (value) {
+                    if (value != null) {
+                      cubit.setThemeMode(SettingsCubit.themeModes[value]!);
+                    }
+                  },
+                  cardColor: cardColor,
+                  subtitleColor: subtitleColor,
+                ),
+                const SizedBox(height: 24),
+                _sectionTitle(l10n.account),
+                const SizedBox(height: 16),
+                _buildMenuItem(
+                  Icons.privacy_tip_outlined,
+                  l10n.privacyPolicy,
+                  () => _showComingSoonDialog(l10n.privacyPolicy),
+                  cardColor: cardColor,
+                ),
+                _buildMenuItem(
+                  Icons.description_outlined,
+                  l10n.termsOfService,
+                  () => _showComingSoonDialog(l10n.termsOfService),
+                  cardColor: cardColor,
+                ),
+                _buildMenuItem(
+                  Icons.info_outline,
+                  l10n.about,
+                  () => _showAboutDialogCustom(),
+                  cardColor: cardColor,
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _showResetDialog(),
+                    icon: const Icon(Icons.restore, color: Colors.red),
+                    label: Text(
+                      l10n.resetAllSettings,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: const BorderSide(color: Colors.red),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _sectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
       ),
     );
   }
@@ -161,16 +143,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     String title,
     String subtitle,
     bool value,
-    ValueChanged<bool> onChanged,
-  ) {
+    ValueChanged<bool> onChanged, {
+    required Color cardColor,
+    required Color subtitleColor,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -192,10 +176,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 12, color: subtitleColor),
                 ),
               ],
             ),
@@ -203,7 +184,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.primary,
+            activeTrackColor: AppColors.primary,
           ),
         ],
       ),
@@ -216,16 +197,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     String value,
     List<String> options,
     ValueChanged<String?> onChanged, {
-    String Function(String)? valueBuilder,
+    required Color cardColor,
+    required Color subtitleColor,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -247,10 +229,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 12, color: subtitleColor),
                 ),
               ],
             ),
@@ -260,8 +239,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             items: options.map((option) {
               return DropdownMenuItem(
                 value: option,
-                child:
-                    Text(valueBuilder != null ? valueBuilder(option) : option),
+                child: Text(option),
               );
             }).toList(),
             onChanged: onChanged,
@@ -272,7 +250,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap) {
+  Widget _buildMenuItem(
+    IconData icon,
+    String title,
+    VoidCallback onTap, {
+    required Color cardColor,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -294,9 +277,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         trailing: Icon(
           Icons.chevron_right,
-          color: Colors.grey.shade400,
+          color: Colors.grey.shade600,
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -304,49 +288,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showComingSoonDialog(String feature, String content) {
+  void _showComingSoonDialog(String feature) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(feature),
-        content: Text(content),
+        content: Text(l10n.featureComingSoon(feature)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(AppLocalizations.of(context).ok),
+            child: Text(l10n.ok),
           ),
         ],
       ),
     );
   }
 
-  void _showAboutDialog() {
-    final tr = AppLocalizations.of(context);
+  void _showAboutDialogCustom() {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: Text(tr.aboutTitle),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(l10n.aboutTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(tr.version),
+            Text(l10n.aboutVersion),
             const SizedBox(height: 8),
-            Text(tr.aboutDetails),
+            Text(l10n.aboutDescription),
             const SizedBox(height: 8),
-            Text(tr.poweredBy),
+            Text(l10n.aboutCopyright),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(tr.ok),
+            child: Text(l10n.ok),
           ),
         ],
       ),
@@ -354,38 +335,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showResetDialog() {
-    final tr = AppLocalizations.of(context);
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded,
+                color: Colors.orange.shade700, size: 26),
+            const SizedBox(width: 8),
+            Expanded(child: Text(l10n.resetSettings)),
+          ],
         ),
-        title: Text(tr.resetSettings),
-        content: Text(tr.resetConfirm),
+        content: Text(l10n.resetSettingsConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(tr.cancel),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
-              setState(() {
-                _notificationsEnabled = true;
-                _locationServicesEnabled = true;
-                _selectedLanguageCode = 'rw';
-                AppLocalizations.localeNotifier.value = const Locale('rw');
-                _selectedTheme = 'System';
-              });
+              context.read<SettingsCubit>().resetSettings();
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(tr.settingsResetConfirmation)),
+                SnackBar(content: Text(l10n.settingsReset)),
               );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
-            child: const Text('Reset'),
+            child: Text(l10n.resetAllSettings),
           ),
         ],
       ),

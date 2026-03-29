@@ -52,7 +52,28 @@ class BookingRepositoryImpl implements BookingRepository {
 
   @override
   Future<void> cancelBooking(String bookingId) async {
+    await _bookingsRef.doc(bookingId).update({'status': 'Cancelled'});
+  }
+
+  @override
+  Future<void> deleteBooking(String bookingId) async {
     await _bookingsRef.doc(bookingId).delete();
+  }
+
+  @override
+  Future<void> updateBooking({
+    required String bookingId,
+    DateTime? date,
+    int? guests,
+    int? totalCost,
+  }) async {
+    final updates = <String, dynamic>{};
+    if (date != null) updates['date'] = Timestamp.fromDate(date);
+    if (guests != null) updates['guests'] = guests;
+    if (totalCost != null) updates['totalCost'] = totalCost;
+    if (updates.isNotEmpty) {
+      await _bookingsRef.doc(bookingId).update(updates);
+    }
   }
 
   Map<String, dynamic> _toMap(BookingEntity booking) {

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get_it/get_it.dart';
 
 // Auth
@@ -31,6 +32,14 @@ import '../../features/settings/domain/repositories/favorites_repository.dart';
 import '../../features/settings/domain/usecases/toggle_favorite_usecase.dart';
 import '../../features/settings/presentation/cubit/favorites_cubit.dart';
 
+// Settings (theme, locale)
+import '../../features/settings/presentation/cubit/settings_cubit.dart';
+
+// Guide Appointments
+import '../../features/guide_appointment/data/repositories/guide_appointment_repository_impl.dart';
+import '../../features/guide_appointment/domain/repositories/guide_appointment_repository.dart';
+import '../../features/guide_appointment/presentation/cubit/guide_appointment_cubit.dart';
+
 // Profile
 import '../../features/profile/data/repositories/profile_repository_impl.dart';
 import '../../features/profile/domain/repositories/profile_repository.dart';
@@ -44,6 +53,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<fb_auth.FirebaseAuth>(
       () => fb_auth.FirebaseAuth.instance);
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
+  sl.registerLazySingleton<FirebaseStorage>(() => FirebaseStorage.instance);
 
   // ── Auth ───────────────────────────────────────────────────────────────
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -85,6 +95,8 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => GetBookingsUseCase(sl()));
   sl.registerLazySingleton(() => UpdatePastBookingsUseCase(sl()));
   sl.registerLazySingleton(() => CancelBookingUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteBookingUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateBookingUseCase(sl()));
   sl.registerFactory(
     () => BookingFormCubit(addBookingUseCase: sl()),
   );
@@ -93,6 +105,8 @@ Future<void> initDependencies() async {
       getBookingsUseCase: sl(),
       updatePastBookingsUseCase: sl(),
       cancelBookingUseCase: sl(),
+      deleteBookingUseCase: sl(),
+      updateBookingUseCase: sl(),
     ),
   );
 
@@ -109,16 +123,29 @@ Future<void> initDependencies() async {
     ),
   );
 
+  // ── Guide Appointments ────────────────────────────────────────────────
+  sl.registerLazySingleton<GuideAppointmentRepository>(
+    () => GuideAppointmentRepositoryImpl(firestore: sl()),
+  );
+  sl.registerFactory(
+    () => GuideAppointmentCubit(repository: sl()),
+  );
+
+  // ── Settings (theme / locale) ────────────────────────────────────────
+  sl.registerLazySingleton(() => SettingsCubit());
+
   // ── Profile ────────────────────────────────────────────────────────────
   sl.registerLazySingleton<ProfileRepository>(
-    () => ProfileRepositoryImpl(firebaseAuth: sl(), firestore: sl()),
+    () => ProfileRepositoryImpl(firebaseAuth: sl(), firestore: sl(), storage: sl()),
   );
   sl.registerLazySingleton(() => GetProfileUseCase(sl()));
   sl.registerLazySingleton(() => UpdateProfileUseCase(sl()));
+  sl.registerLazySingleton(() => UploadProfilePhotoUseCase(sl()));
   sl.registerFactory(
     () => ProfileCubit(
       getProfileUseCase: sl(),
       updateProfileUseCase: sl(),
+      uploadProfilePhotoUseCase: sl(),
     ),
   );
 }
