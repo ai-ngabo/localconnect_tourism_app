@@ -88,6 +88,17 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                 else
                   ...loaded.past.map(
                       (b) => _buildBookingCard(context, b, isUpcoming: false)),
+                if (loaded.cancelled.isNotEmpty) ...[
+                  const SizedBox(height: 28),
+                  const Text('Cancelled',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red)),
+                  const SizedBox(height: 14),
+                  ...loaded.cancelled.map(
+                      (b) => _buildBookingCard(context, b, isUpcoming: false)),
+                ],
               ],
             ),
           );
@@ -96,11 +107,21 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
     );
   }
 
-  void _showCancelDialog(BuildContext context, String bookingId) {
+  // ── Cancel Dialog ──────────────────────────────────────────────────────────
+
+  void _showCancelDialog(BuildContext parentContext, String bookingId) {
+    final cubit = parentContext.read<BookingsListCubit>();
     showDialog(
-      context: context,
+      context: parentContext,
       builder: (ctx) => AlertDialog(
-        title: const Text('Cancel Booking'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 24),
+            SizedBox(width: 10),
+            Text('Cancel Booking'),
+          ],
+        ),
         content: const Text(
             'Are you sure you want to cancel this booking? This cannot be undone.'),
         actions: [
@@ -109,9 +130,17 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
             child: const Text('Keep'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(ctx);
-              context.read<BookingsListCubit>().cancelBooking(bookingId);
+              await cubit.cancelBooking(bookingId);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Booking cancelled'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
             child: const Text('Cancel Booking',
                 style: TextStyle(color: Colors.red)),
@@ -120,6 +149,237 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
       ),
     );
   }
+
+  // ── Edit Bottom Sheet ──────────────────────────────────────────────────────
+
+  void _showEditSheet(BuildContext parentContext, BookingEntity booking) {
+    final cubit = parentContext.read<BookingsListCubit>();
+    DateTime selectedDate = booking.date;
+    int guestCount = booking.guests;
+
+    showModalBottomSheet(
+      context: parentContext,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            final totalCost = booking.tour.priceRwf * guestCount;
+
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 16,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Drag handle
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Header
+                  Row(
+                    children: [
+                      const Icon(Icons.edit_calendar, color: AppColors.primary),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'Edit: ${booking.tour.title}',
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Date picker
+                  const Text('Date',
+                      style: TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime.now(),
+                        lastDate:
+                            DateTime.now().add(const Duration(days: 365)),
+                        builder: (context, child) => Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: const ColorScheme.light(
+                              primary: AppColors.primary,
+                              onPrimary: Colors.white,
+                              surface: Colors.white,
+                              onSurface: Colors.black,
+                            ),
+                          ),
+                          child: child!,
+                        ),
+                      );
+                      if (picked != null) {
+                        setSheetState(() => selectedDate = picked);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey.shade50,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.calendar_today,
+                              size: 20, color: Colors.grey.shade600),
+                          const SizedBox(width: 12),
+                          Text(
+                            DateFormat('EEE, MMM dd, yyyy')
+                                .format(selectedDate),
+                            style: const TextStyle(fontSize: 15),
+                          ),
+                          const Spacer(),
+                          Icon(Icons.arrow_drop_down,
+                              color: Colors.grey.shade600),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Guest counter
+                  const Text('Guests',
+                      style: TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 6),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.grey.shade50,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.people_outline,
+                            size: 20, color: Colors.grey.shade600),
+                        const SizedBox(width: 12),
+                        Text('$guestCount',
+                            style: const TextStyle(fontSize: 16)),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: guestCount > 1
+                              ? () =>
+                                  setSheetState(() => guestCount--)
+                              : null,
+                          icon: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.remove, size: 18),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () =>
+                              setSheetState(() => guestCount++),
+                          icon: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.add,
+                                size: 18, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Total cost
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.menuItemBg,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Total Cost',
+                            style: TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.w600)),
+                        Text(AppFormat.price(totalCost),
+                            style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Save button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        cubit.updateBooking(
+                              bookingId: booking.id,
+                              date: selectedDate,
+                              guests: guestCount,
+                              totalCost: totalCost,
+                            );
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Booking updated successfully'),
+                            backgroundColor: AppColors.primary,
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text('Save Changes',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600)),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // ── Empty State ────────────────────────────────────────────────────────────
 
   Widget _buildEmptyState(String message) {
     return Container(
@@ -131,14 +391,16 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
       ),
       child: Column(
         children: [
-          Icon(Icons.calendar_today, size: 36, color: Colors.grey.shade400),
+          Icon(Icons.calendar_today, size: 36, color: Colors.grey.shade600),
           const SizedBox(height: 10),
           Text(message,
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 14)),
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
         ],
       ),
     );
   }
+
+  // ── Booking Card ───────────────────────────────────────────────────────────
 
   Widget _buildBookingCard(BuildContext context, BookingEntity booking,
       {required bool isUpcoming}) {
@@ -151,7 +413,7 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardTheme.color ?? Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -170,7 +432,8 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
               decoration: BoxDecoration(
                 image: AppStyles.tourImages[booking.tour.id] != null
                     ? DecorationImage(
-                        image: AssetImage(AppStyles.tourImages[booking.tour.id]!),
+                        image:
+                            AssetImage(AppStyles.tourImages[booking.tour.id]!),
                         fit: BoxFit.cover,
                       )
                     : null,
@@ -206,19 +469,35 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 6),
+                  // Date
                   Row(
                     children: [
                       Icon(Icons.calendar_today,
-                          size: 14, color: Colors.grey.shade500),
+                          size: 14, color: Colors.grey.shade600),
                       const SizedBox(width: 6),
                       Text(
-                        '${AppStrings.date} ${DateFormat('MMM dd, yyyy').format(booking.date)}',
+                        '${AppStrings.date} ${DateFormat('EEE, MMM dd, yyyy').format(booking.date)}',
+                        style: TextStyle(
+                            fontSize: 13, color: Colors.grey.shade600),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  // Guests & Cost
+                  Row(
+                    children: [
+                      Icon(Icons.people_outline,
+                          size: 14, color: Colors.grey.shade600),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${booking.guests} guest(s)  •  ${AppFormat.price(booking.totalCost)}',
                         style: TextStyle(
                             fontSize: 13, color: Colors.grey.shade600),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
+                  // Status + Actions
                   Row(
                     children: [
                       Container(
@@ -240,6 +519,21 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                       ),
                       if (isUpcoming) ...[
                         const Spacer(),
+                        // Edit button
+                        TextButton.icon(
+                          onPressed: () =>
+                              _showEditSheet(context, booking),
+                          icon: const Icon(Icons.edit_outlined,
+                              size: 16, color: AppColors.primary),
+                          label: const Text('Edit',
+                              style: TextStyle(
+                                  color: AppColors.primary, fontSize: 13)),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                          ),
+                        ),
+                        // Cancel button
                         TextButton.icon(
                           onPressed: () =>
                               _showCancelDialog(context, booking.id),

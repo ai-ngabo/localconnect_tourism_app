@@ -41,7 +41,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final email = msg.split('email_not_verified:').last;
         emit(AuthEmailNotVerified(email));
       } else {
-        emit(const AuthError('Something went wrong. Please try again.'));
+        emit(const AuthError('Incorrect email or password'));
       }
     }
   }
@@ -104,17 +104,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   String _mapFirebaseAuthError(fb_auth.FirebaseAuthException e) {
-    switch (e.code) {
-      case 'user-not-found':
-        return 'No user found for that email.';
-      case 'wrong-password':
-      case 'invalid-credential':
-      case 'invalid-login-credentials':
-        return 'Incorrect password. Please try again.';
-      case 'invalid-email':
-        return 'Please enter a valid email.';
-      default:
-        return e.message ?? 'Something went wrong. Please try again.';
-    }
+    return 'Incorrect email or password';
   }
 }

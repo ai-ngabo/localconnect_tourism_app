@@ -50,10 +50,29 @@ class _BookingScreenState extends State<BookingScreen> {
 
   void _confirmBooking(
       BuildContext context, TourEntity tour, BookingFormInitial formState) {
-    final totalCost = tour.priceRwf * formState.guests;
+    if (!UserSession.isLoggedIn) {
+      Navigator.pushNamed(context, AppRoutes.login);
+      return;
+    }
+    final user = UserSession.currentUser;
+    if (user == null) return;
 
+    final totalCost = tour.priceRwf * formState.guests;
+    final booking = BookingEntity(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      tour: tour,
+      date: formState.selectedDate ??
+          DateTime.now().add(const Duration(days: 1)),
+      guests: formState.guests,
+      totalCost: totalCost,
+      status: 'Confirmed',
+      userEmail: user.email,
+    );
+
+    // Show confirmation dialog — no action buttons needed; auto-navigates
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
@@ -76,67 +95,36 @@ class _BookingScreenState extends State<BookingScreen> {
             Text('${AppStrings.guests} ${formState.guests}'),
             const SizedBox(height: 6),
             Text(
-              '${AppStrings.total} ${totalCost}00 Rwf',
+              '${AppStrings.total} ${AppFormat.price(totalCost)}',
               style: const TextStyle(
                   fontWeight: FontWeight.bold, color: AppColors.primary),
             ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  'Redirecting to your bookings\u2026',
+                  style: TextStyle(
+                      color: Colors.grey.shade600, fontSize: 13),
+                ),
+              ],
+            ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.pushNamedAndRemoveUntil(
-                  context, AppRoutes.home, (route) => false);
-            },
-            child: const Text(AppStrings.backToHome),
-          ),
-          BlocBuilder<BookingFormCubit, BookingFormState>(
-            builder: (context, state) {
-              final isSubmitting = state is BookingFormSubmitting;
-              return ElevatedButton(
-                onPressed: isSubmitting
-                    ? null
-                    : () async {
-                        if (!UserSession.isLoggedIn) {
-                          Navigator.pop(ctx);
-                          Navigator.pushNamed(context, AppRoutes.login);
-                          return;
-                        }
-                        final user = UserSession.currentUser;
-                        if (user == null) return;
-
-                        final booking = BookingEntity(
-                          id: DateTime.now().millisecondsSinceEpoch.toString(),
-                          tour: tour,
-                          date: formState.selectedDate ??
-                              DateTime.now().add(const Duration(days: 1)),
-                          guests: formState.guests,
-                          totalCost: totalCost,
-                          status: 'Confirmed',
-                          userEmail: user.email,
-                        );
-
-                        await context
-                            .read<BookingFormCubit>()
-                            .confirmBooking(booking);
-                      },
-                child: isSubmitting
-                    ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation(Colors.white),
-                        ),
-                      )
-                    : const Text(AppStrings.viewBookings),
-              );
-            },
-          ),
-        ],
       ),
     );
+
+    // Submit immediately — BlocListener handles navigation after 2 s
+    context.read<BookingFormCubit>().confirmBooking(booking);
   }
 
   @override
@@ -156,10 +144,15 @@ class _BookingScreenState extends State<BookingScreen> {
     return BlocListener<BookingFormCubit, BookingFormState>(
       listener: (context, state) {
         if (state is BookingFormSuccess) {
-          Navigator.of(context)
-            ..pop() // close dialog
-            ..pushNamed(AppRoutes.bookingsList);
+          Future.delayed(const Duration(seconds: 2), () {
+            if (context.mounted) {
+              Navigator.of(context)
+                ..pop() // close confirmation dialog
+                ..pushNamed(AppRoutes.bookingsList);
+            }
+          });
         } else if (state is BookingFormError) {
+          Navigator.of(context).pop(); // close confirmation dialog
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(state.message),
             backgroundColor: AppColors.primary,
@@ -224,7 +217,7 @@ class _BookingScreenState extends State<BookingScreen> {
                                     fontSize: 18, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 4),
                             Text(
-                                '${tour.duration} · ${tour.priceRwf} Rwf/person',
+                                '${tour.duration} · ${AppFormat.price(tour.priceRwf)}/person',
                                 style: TextStyle(
                                     color: Colors.grey.shade600, fontSize: 13)),
                           ],
@@ -253,7 +246,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       child: Row(
                         children: [
                           Icon(Icons.calendar_today,
-                              size: 20, color: Colors.grey.shade500),
+                              size: 20, color: Colors.grey.shade600),
                           const SizedBox(width: 12),
                           Text(
                             formState.selectedDate != null
@@ -264,12 +257,12 @@ class _BookingScreenState extends State<BookingScreen> {
                               fontSize: 15,
                               color: formState.selectedDate != null
                                   ? Colors.black87
-                                  : Colors.grey.shade400,
+                                  : Colors.grey.shade600,
                             ),
                           ),
                           const Spacer(),
                           Icon(Icons.arrow_drop_down,
-                              color: Colors.grey.shade500),
+                              color: Colors.grey.shade600),
                         ],
                       ),
                     ),
@@ -293,7 +286,7 @@ class _BookingScreenState extends State<BookingScreen> {
                     child: Row(
                       children: [
                         Icon(Icons.people_outline,
-                            size: 20, color: Colors.grey.shade500),
+                            size: 20, color: Colors.grey.shade600),
                         const SizedBox(width: 12),
                         Text('${formState.guests}',
                             style: const TextStyle(fontSize: 16)),
@@ -344,7 +337,7 @@ class _BookingScreenState extends State<BookingScreen> {
                         const Text(AppStrings.totalCost,
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w600)),
-                        Text('${totalCost}00 Rwf',
+                        Text(AppFormat.price(totalCost),
                             style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -365,7 +358,7 @@ class _BookingScreenState extends State<BookingScreen> {
                     decoration: InputDecoration(
                       hintText: 'Any special requests or notes...',
                       hintStyle:
-                          TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                          TextStyle(color: Colors.grey.shade600, fontSize: 14),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey.shade300),

@@ -30,3 +30,33 @@ class CancelBookingUseCase {
     return repository.cancelBooking(bookingId);
   }
 }
+
+class DeleteBookingUseCase {
+  final BookingRepository repository;
+
+  DeleteBookingUseCase(this.repository);
+
+  Future<void> call(String bookingId) {
+    return repository.deleteBooking(bookingId);
+  }
+}
+
+class UpdateBookingUseCase {
+  final BookingRepository repository;
+
+  UpdateBookingUseCase(this.repository);
+
+  Future<void> call({
+    required String bookingId,
+    DateTime? date,
+    int? guests,
+    int? totalCost,
+  }) {
+    return repository.updateBooking(
+      bookingId: bookingId,
+      date: date,
+      guests: guests,
+      totalCost: totalCost,
+    );
+  }
+}

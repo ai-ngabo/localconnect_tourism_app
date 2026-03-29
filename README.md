@@ -4,16 +4,16 @@ A Flutter mobile app for discovering and booking authentic community tours in Rw
 
 ## Screens
 
-| Screen            | Description                                                      |
-| ----------------- | ---------------------------------------------------------------- |
-| **Splash**        | Welcome screen with "Get Started" and "Log In" buttons           |
-| **Sign Up**       | Registration form with name, email, password, Google sign-in     |
-| **Log In**        | Login form with email, password, forgot password, Google sign-in |
-| **Home**          | Main screen with search, popular tours, local guides, bottom nav |
-| **Tour Detail**   | Full tour info with description, duration, price, "Book Now"     |
-| **Booking**       | Date picker, guest counter, total cost, special requests         |
-| **Bookings List** | Upcoming (Confirmed) and Past (Completed) bookings               |
-| **Profile**       | User info, My Tours, Favorites, Settings, Support, Log Out       |
+| Screen | Description |
+|--------|-------------|
+| **Splash** | Welcome screen with "Get Started" and "Log In" buttons |
+| **Sign Up** | Registration form with name, email, password, Google sign-in |
+| **Log In** | Login form with email, password, forgot password, Google sign-in |
+| **Home** | Main screen with search, popular tours, local guides, bottom nav |
+| **Tour Detail** | Full tour info with description, duration, price, "Book Now" |
+| **Booking** | Date picker, guest counter, total cost, special requests |
+| **Bookings List** | Upcoming (Confirmed) and Past (Completed) bookings |
+| **Profile** | User info, My Tours, Favorites, Settings, Support, Log Out |
 
 ## Navigation Flow
 
@@ -27,7 +27,6 @@ Splash → Sign Up ↔ Log In → Home
 ## Setup & Run
 
 ### Prerequisites
-
 - Flutter SDK (3.0+)
 - Android Studio / Xcode
 - A connected device or emulator
@@ -46,7 +45,6 @@ flutter run
 ```
 
 ### Create empty assets folder (required)
-
 ```bash
 mkdir -p assets/images
 touch assets/images/.gitkeep
@@ -81,5 +79,3 @@ lib/
 - ✅ Logout with confirmation
 - ✅ Green nature-themed UI matching the design
 - ✅ Placeholder graphics (gradient + icons) — replace with real images
-
-To add real images, place them in `assets/images/` and update the image references in the tour cards and detail screens to use `Image.asset()` instead of the gradient containers.

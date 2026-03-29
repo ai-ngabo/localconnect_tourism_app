@@ -151,7 +151,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                         color: Colors.grey.shade600,
                                         fontSize: 13)),
                                 const SizedBox(height: 4),
-                                Text('${tour.priceRwf} Rwf',
+                                Text(AppFormat.price(tour.priceRwf),
                                     style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,

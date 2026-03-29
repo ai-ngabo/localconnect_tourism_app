@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -60,10 +62,12 @@ class ProfileError extends ProfileState {
 class ProfileCubit extends Cubit<ProfileState> {
   final GetProfileUseCase getProfileUseCase;
   final UpdateProfileUseCase updateProfileUseCase;
+  final UploadProfilePhotoUseCase uploadProfilePhotoUseCase;
 
   ProfileCubit({
     required this.getProfileUseCase,
     required this.updateProfileUseCase,
+    required this.uploadProfilePhotoUseCase,
   }) : super(const ProfileInitial());
 
   Future<void> loadProfile() async {
@@ -80,18 +84,48 @@ class ProfileCubit extends Cubit<ProfileState> {
     }
   }
 
-  Future<void> updateProfile({required String name}) async {
+  Future<void> updateProfile({
+    required String name,
+    String? phone,
+    String? bio,
+  }) async {
     final current = state;
-    if (current is! ProfileLoaded) return;
+    final currentProfile = current is ProfileLoaded
+        ? current.profile
+        : current is ProfileUpdateSuccess
+            ? current.profile
+            : null;
+    if (currentProfile == null) return;
 
-    emit(ProfileUpdating(current.profile));
+    emit(ProfileUpdating(currentProfile));
     try {
-      await updateProfileUseCase(name: name);
-      final updated = current.profile.copyWith(name: name);
+      await updateProfileUseCase(name: name, phone: phone, bio: bio);
+      final updated = currentProfile.copyWith(
+        name: name,
+        phone: phone,
+        bio: bio,
+      );
       emit(ProfileUpdateSuccess(updated));
       emit(ProfileLoaded(updated));
     } catch (e) {
       emit(ProfileError(e.toString()));
+    }
+  }
+
+  Future<void> uploadPhoto(File imageFile) async {
+    final current = state;
+    final currentProfile = current is ProfileLoaded ? current.profile : null;
+    if (currentProfile == null) return;
+
+    emit(ProfileUpdating(currentProfile));
+    try {
+      final photoUrl = await uploadProfilePhotoUseCase(imageFile);
+      final updated = currentProfile.copyWith(photoUrl: photoUrl);
+      emit(ProfileUpdateSuccess(updated));
+      emit(ProfileLoaded(updated));
+    } catch (e) {
+      emit(ProfileError('Could not upload photo. Please try again.'));
+      emit(ProfileLoaded(currentProfile));
     }
   }
 }
