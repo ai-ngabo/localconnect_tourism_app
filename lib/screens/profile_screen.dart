@@ -31,7 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.grey.shade50,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: BlocBuilder<ProfileCubit, ProfileState>(
           builder: (context, state) {
             final profile = state is ProfileLoaded
@@ -156,7 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
@@ -170,6 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             if (phone.isNotEmpty)
                               _infoTile(
+                                context: context,
                                 icon: Icons.phone_outlined,
                                 label: 'Phone',
                                 value: phone,
@@ -177,6 +178,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             if (bio.isNotEmpty)
                               _infoTile(
+                                context: context,
                                 icon: Icons.info_outline,
                                 label: 'About',
                                 value: bio,
@@ -194,7 +196,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
@@ -207,6 +209,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         children: [
                           _menuItem(
+                            context: context,
                             icon: Icons.person_outline,
                             title: AppStrings.editProfile,
                             onTap: () async {
@@ -219,6 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             showDivider: true,
                           ),
                           _menuItem(
+                            context: context,
                             icon: Icons.calendar_today_outlined,
                             title: AppStrings.myTours,
                             onTap: () => Navigator.pushNamed(
@@ -226,6 +230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             showDivider: true,
                           ),
                           _menuItem(
+                            context: context,
                             icon: Icons.favorite_outline,
                             title: AppStrings.favorites,
                             onTap: () => Navigator.pushNamed(
@@ -233,6 +238,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             showDivider: true,
                           ),
                           _menuItem(
+                            context: context,
                             icon: Icons.settings_outlined,
                             title: AppStrings.settingsLabel,
                             onTap: () => Navigator.pushNamed(
@@ -240,6 +246,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             showDivider: true,
                           ),
                           _menuItem(
+                            context: context,
                             icon: Icons.help_outline,
                             title: AppStrings.supportFaq,
                             onTap: () => Navigator.pushNamed(
@@ -290,11 +297,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _infoTile({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required String value,
     required bool showDivider,
   }) {
+    final cs = Theme.of(context).colorScheme;
     return Column(
       children: [
         Padding(
@@ -316,11 +325,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Text(label,
                         style: TextStyle(
-                            fontSize: 12, color: Colors.grey.shade600)),
+                            fontSize: 12,
+                            color: cs.onSurface.withValues(alpha: 0.6))),
                     const SizedBox(height: 2),
                     Text(value,
-                        style: const TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w500)),
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: cs.onSurface)),
                   ],
                 ),
               ),
@@ -328,20 +340,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         if (showDivider)
-          Divider(
-              height: 1,
-              indent: 58,
-              color: Colors.grey.shade200),
+          Divider(height: 1, indent: 58, color: Theme.of(context).dividerColor),
       ],
     );
   }
 
   Widget _menuItem({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required VoidCallback onTap,
     required bool showDivider,
   }) {
+    final cs = Theme.of(context).colorScheme;
     return Column(
       children: [
         InkWell(
@@ -364,20 +375,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(width: 14),
                 Expanded(
                   child: Text(title,
-                      style: const TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.w500)),
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: cs.onSurface)),
                 ),
                 Icon(Icons.chevron_right,
-                    color: Colors.grey.shade600, size: 22),
+                    color: cs.onSurface.withValues(alpha: 0.5), size: 22),
               ],
             ),
           ),
         ),
         if (showDivider)
-          Divider(
-              height: 1,
-              indent: 58,
-              color: Colors.grey.shade200),
+          Divider(height: 1, indent: 58, color: Theme.of(context).dividerColor),
       ],
     );
   }

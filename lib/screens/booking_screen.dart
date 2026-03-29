@@ -50,10 +50,29 @@ class _BookingScreenState extends State<BookingScreen> {
 
   void _confirmBooking(
       BuildContext context, TourEntity tour, BookingFormInitial formState) {
-    final totalCost = tour.priceRwf * formState.guests;
+    if (!UserSession.isLoggedIn) {
+      Navigator.pushNamed(context, AppRoutes.login);
+      return;
+    }
+    final user = UserSession.currentUser;
+    if (user == null) return;
 
+    final totalCost = tour.priceRwf * formState.guests;
+    final booking = BookingEntity(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      tour: tour,
+      date: formState.selectedDate ??
+          DateTime.now().add(const Duration(days: 1)),
+      guests: formState.guests,
+      totalCost: totalCost,
+      status: 'Confirmed',
+      userEmail: user.email,
+    );
+
+    // Show confirmation dialog — no action buttons needed; auto-navigates
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
@@ -80,63 +99,32 @@ class _BookingScreenState extends State<BookingScreen> {
               style: const TextStyle(
                   fontWeight: FontWeight.bold, color: AppColors.primary),
             ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  'Redirecting to your bookings\u2026',
+                  style: TextStyle(
+                      color: Colors.grey.shade600, fontSize: 13),
+                ),
+              ],
+            ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.pushNamedAndRemoveUntil(
-                  context, AppRoutes.home, (route) => false);
-            },
-            child: const Text(AppStrings.backToHome),
-          ),
-          BlocBuilder<BookingFormCubit, BookingFormState>(
-            builder: (context, state) {
-              final isSubmitting = state is BookingFormSubmitting;
-              return ElevatedButton(
-                onPressed: isSubmitting
-                    ? null
-                    : () async {
-                        if (!UserSession.isLoggedIn) {
-                          Navigator.pop(ctx);
-                          Navigator.pushNamed(context, AppRoutes.login);
-                          return;
-                        }
-                        final user = UserSession.currentUser;
-                        if (user == null) return;
-
-                        final booking = BookingEntity(
-                          id: DateTime.now().millisecondsSinceEpoch.toString(),
-                          tour: tour,
-                          date: formState.selectedDate ??
-                              DateTime.now().add(const Duration(days: 1)),
-                          guests: formState.guests,
-                          totalCost: totalCost,
-                          status: 'Confirmed',
-                          userEmail: user.email,
-                        );
-
-                        await context
-                            .read<BookingFormCubit>()
-                            .confirmBooking(booking);
-                      },
-                child: isSubmitting
-                    ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation(Colors.white),
-                        ),
-                      )
-                    : const Text(AppStrings.viewBookings),
-              );
-            },
-          ),
-        ],
       ),
     );
+
+    // Submit immediately — BlocListener handles navigation after 2 s
+    context.read<BookingFormCubit>().confirmBooking(booking);
   }
 
   @override
@@ -156,10 +144,15 @@ class _BookingScreenState extends State<BookingScreen> {
     return BlocListener<BookingFormCubit, BookingFormState>(
       listener: (context, state) {
         if (state is BookingFormSuccess) {
-          Navigator.of(context)
-            ..pop() // close dialog
-            ..pushNamed(AppRoutes.bookingsList);
+          Future.delayed(const Duration(seconds: 2), () {
+            if (context.mounted) {
+              Navigator.of(context)
+                ..pop() // close confirmation dialog
+                ..pushNamed(AppRoutes.bookingsList);
+            }
+          });
         } else if (state is BookingFormError) {
+          Navigator.of(context).pop(); // close confirmation dialog
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(state.message),
             backgroundColor: AppColors.primary,

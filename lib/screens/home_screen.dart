@@ -1013,91 +1013,122 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildExploreContent(TourismLoaded state) {
     final selectedCategory = state.selectedCategory;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final hPad = (screenWidth * 0.05).clamp(12.0, 24.0);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 20),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(AppStrings.explore,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
-          TextField(
-            onChanged: (q) => context.read<TourismCubit>().search(q),
-            decoration: InputDecoration(
-              hintText: AppStrings.searchToursGuidesActivities,
-              prefixIcon: const Icon(Icons.search),
-              filled: true,
-              fillColor: Colors.grey.shade100,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide.none,
+              Text(
+                AppStrings.explore,
+                style: TextStyle(
+                  fontSize: (screenWidth * 0.06).clamp(18.0, 26.0),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text('Categories',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _buildCategoryChip('All', Icons.apps, selectedCategory == null, const Color(0xFF455A64)),
-                const SizedBox(width: 10),
-                _buildCategoryChip('Cultural', Icons.account_balance, selectedCategory == 'Cultural', const Color(0xFF7B61FF)),
-                const SizedBox(width: 10),
-                _buildCategoryChip('Nature', Icons.forest, selectedCategory == 'Nature', const Color(0xFF2E7D32)),
-                const SizedBox(width: 10),
-                _buildCategoryChip('Adventure', Icons.hiking, selectedCategory == 'Adventure', const Color(0xFFE65100)),
-                const SizedBox(width: 10),
-                _buildCategoryChip('Food', Icons.restaurant_menu, selectedCategory == 'Food', const Color(0xFFD32F2F)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            selectedCategory != null ? '$selectedCategory Tours' : 'All Tours',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          if (state.filteredTours.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 40),
-              child: Center(
-                child: Column(
+              const SizedBox(height: 16),
+              TextField(
+                onChanged: (q) => context.read<TourismCubit>().search(q),
+                decoration: InputDecoration(
+                  hintText: AppStrings.searchToursGuidesActivities,
+                  prefixIcon: const Icon(Icons.search),
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Categories',
+                style: TextStyle(
+                  fontSize: (screenWidth * 0.045).clamp(14.0, 20.0),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
                   children: [
-                    Icon(Icons.search_off, size: 48, color: Colors.grey.shade300),
-                    const SizedBox(height: 12),
-                    Text(
-                      'No tours found in this category',
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                    ),
+                    _buildCategoryChip('All', Icons.apps,
+                        selectedCategory == null, const Color(0xFF455A64)),
+                    const SizedBox(width: 10),
+                    _buildCategoryChip('Cultural', Icons.account_balance,
+                        selectedCategory == 'Cultural',
+                        const Color(0xFF7B61FF)),
+                    const SizedBox(width: 10),
+                    _buildCategoryChip('Nature', Icons.forest,
+                        selectedCategory == 'Nature', const Color(0xFF2E7D32)),
+                    const SizedBox(width: 10),
+                    _buildCategoryChip('Adventure', Icons.hiking,
+                        selectedCategory == 'Adventure',
+                        const Color(0xFFE65100)),
+                    const SizedBox(width: 10),
+                    _buildCategoryChip('Food', Icons.restaurant_menu,
+                        selectedCategory == 'Food', const Color(0xFFD32F2F)),
                   ],
                 ),
               ),
-            )
-          else
-            ...state.filteredTours.map(_buildExploreTourItem),
-          ],
+              const SizedBox(height: 24),
+              Text(
+                selectedCategory != null
+                    ? '$selectedCategory Tours'
+                    : 'All Tours',
+                style: TextStyle(
+                  fontSize: (screenWidth * 0.045).clamp(14.0, 20.0),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (state.filteredTours.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 40),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Icon(Icons.search_off,
+                            size: 48, color: Colors.grey.shade300),
+                        const SizedBox(height: 12),
+                        Text(
+                          'No tours found in this category',
+                          style: TextStyle(
+                              color: Colors.grey.shade600, fontSize: 14),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                ...state.filteredTours.map(_buildExploreTourItem),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
 
-  Widget _buildCategoryChip(String label, IconData icon, bool selected, Color color) {
+  Widget _buildCategoryChip(
+      String label, IconData icon, bool selected, Color color) {
+    final chipPad = (MediaQuery.of(context).size.width * 0.03).clamp(10.0, 16.0);
+    final iconSize = (MediaQuery.of(context).size.width * 0.065).clamp(20.0, 28.0);
     return GestureDetector(
-      onTap: () => context.read<TourismCubit>()
+      onTap: () => context
+          .read<TourismCubit>()
           .filterByCategory(label == 'All' ? null : label),
       child: Column(
         children: [
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.all(chipPad),
             decoration: BoxDecoration(
               color: selected ? color : color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
@@ -1107,14 +1138,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             child: Icon(icon,
-                color: selected ? Colors.white : color, size: 26),
+                color: selected ? Colors.white : color, size: iconSize),
           ),
           const SizedBox(height: 6),
-          Text(label,
-              style: TextStyle(
-                  fontSize: 12,
-                  color: selected ? color : Colors.grey.shade600,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.normal)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: selected ? color : Colors.grey.shade600,
+              fontWeight:
+                  selected ? FontWeight.w700 : FontWeight.normal,
+            ),
+          ),
         ],
       ),
     );
@@ -1173,23 +1208,33 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text(tour.title,
                       style: const TextStyle(
-                          fontWeight: FontWeight.w600, fontSize: 15)),
+                          fontWeight: FontWeight.w600, fontSize: 15),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
                   Text('${tour.duration} · ${tour.category}',
                       style: TextStyle(
-                          color: Colors.grey.shade600, fontSize: 13)),
+                          color: Colors.grey.shade600, fontSize: 13),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
                   Row(
                     children: [
                       const Icon(Icons.star, size: 14, color: Colors.amber),
-                      Text(' ${tour.rating}',
-                          style: TextStyle(
-                              fontSize: 13, color: Colors.grey.shade600)),
+                      Flexible(
+                        child: Text(' ${tour.rating}',
+                            style: TextStyle(
+                                fontSize: 13, color: Colors.grey.shade600),
+                            overflow: TextOverflow.ellipsis),
+                      ),
                       const Spacer(),
-                      Text(AppFormat.price(tour.priceRwf),
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primary)),
+                      Flexible(
+                        child: Text(AppFormat.price(tour.priceRwf),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary),
+                            overflow: TextOverflow.ellipsis),
+                      ),
                     ],
                   ),
                 ],

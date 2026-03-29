@@ -106,15 +106,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 32),
                 SizedBox(
                   width: double.infinity,
-                  child: OutlinedButton(
+                  child: OutlinedButton.icon(
                     onPressed: () => _showResetDialog(),
+                    icon: const Icon(Icons.restore, color: Colors.red),
+                    label: Text(
+                      l10n.resetAllSettings,
+                      style: const TextStyle(color: Colors.red),
+                    ),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       side: const BorderSide(color: Colors.red),
-                    ),
-                    child: Text(
-                      l10n.resetAllSettings,
-                      style: const TextStyle(color: Colors.red),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                 ),
@@ -337,7 +340,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(l10n.resetSettings),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded,
+                color: Colors.orange.shade700, size: 26),
+            const SizedBox(width: 8),
+            Expanded(child: Text(l10n.resetSettings)),
+          ],
+        ),
         content: Text(l10n.resetSettingsConfirm),
         actions: [
           TextButton(
@@ -352,7 +362,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SnackBar(content: Text(l10n.settingsReset)),
               );
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
             child: Text(l10n.resetAllSettings),
           ),
         ],

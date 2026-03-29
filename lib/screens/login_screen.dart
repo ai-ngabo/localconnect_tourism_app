@@ -44,11 +44,11 @@ class _LoginScreenState extends State<LoginScreen> {
           UserSession.login(
             User(name: state.user.name, email: state.user.email),
           );
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            AppRoutes.home,
-            (route) => false,
-          );
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('You have logged in successfully'),
+            backgroundColor: Colors.green,
+          ));
+          Navigator.pushReplacementNamed(context, '/home');
         } else if (state is AuthEmailNotVerified) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(state.message),
-            backgroundColor: AppColors.primary,
+            backgroundColor: Colors.red,
           ));
         }
       },
