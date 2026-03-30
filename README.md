@@ -24,6 +24,10 @@ Splash → Sign Up ↔ Log In → Home
                               └── Profile → Log Out → Splash
 ```
 
+## App Showcase
+
+![All Screens](assets/images/All%20Screens.png)
+
 ## Setup & Run
 
 ### Prerequisites
@@ -80,6 +84,3 @@ lib/
 - ✅ Bottom navigation bar
 - ✅ Logout with confirmation
 - ✅ Green nature-themed UI matching the design
-- ✅ Placeholder graphics (gradient + icons) — replace with real images
-
-To add real images, place them in `assets/images/` and update the image references in the tour cards and detail screens to use `Image.asset()` instead of the gradient containers.
