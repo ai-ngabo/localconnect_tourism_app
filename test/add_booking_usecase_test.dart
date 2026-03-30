@@ -25,6 +25,21 @@ class MockBookingRepository implements BookingRepository {
   Future<void> cancelBooking(String bookingId) async {
     // Mock implementation
   }
+
+  @override
+  Future<void> deleteBooking(String bookingId) async {
+    // Mock implementation
+  }
+
+  @override
+  Future<void> updateBooking({
+    required String bookingId,
+    DateTime? date,
+    int? guests,
+    int? totalCost,
+  }) async {
+    // Mock implementation
+  }
 }
 
 void main() {
